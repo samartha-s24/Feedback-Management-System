@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFMS — Alumni Portal</title>
+<style>
+  :root{
+    --bg: #0b1220;
+    --sidebar-bg: #0a0f1a;
+    --card-bg: #131b2c;
+    --card-bg-2: #101827;
+    --border: #1f2b3f;
+    --text: #e8edf5;
+    --text-muted: #8b96ab;
+    --text-faint: #5c6980;
+    --accent-1: #12b9c9;
+    --accent-2: #1691d9;
+    --accent-grad: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+    --accent-on: #04262a;
+    --accent-soft-bg: #0f2733;
+    --green: #17c187;
+    --green-bg: #0f2a25;
+    --orange: #f5a524;
+    --orange-bg: #2a2114;
+    --indigo: #5b6bea;
+    --indigo-bg: #1a1c3a;
+    --red: #ef4444;
+    --red-bg: #2a1418;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+  }
+  body[data-theme="light"]{
+    --bg: #f2f4f9;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --card-bg-2: #f6f8fc;
+    --border: #e2e7f0;
+    --text: #16202f;
+    --text-muted: #5b6577;
+    --text-faint: #8891a3;
+    --accent-on: #ffffff;
+    --accent-soft-bg: #e6f7f9;
+    --green-bg: #e4f9f0;
+    --orange-bg: #fdf1de;
+    --indigo-bg: #eaebfc;
+    --red-bg: #fde9ea;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    font-size:14px;
+    transition: background .2s, color .2s;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit;}
+
+  /* ===================== LOGIN SCREEN ===================== */
+  #loginScreen{
+    display:flex; min-height:100vh; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .login-shell{
+    width:920px; max-width:100%; min-height:560px;
+    background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg);
+    display:flex; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .login-visual{
+    flex:1; background: linear-gradient(150deg, var(--accent-1), var(--accent-2));
+    padding:44px; display:flex; flex-direction:column; justify-content:space-between; color:#fff;
+    min-width:320px;
+  }
+  .login-visual-icon{
+    width:54px; height:54px; border-radius:14px; background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:18px;
+  }
+  .login-visual h2{font-size:26px; font-weight:800; line-height:1.3; margin-bottom:12px;}
+  .login-visual p{font-size:13.5px; color:rgba(255,255,255,.9); line-height:1.6;}
+  .login-visual-quote{font-size:12.5px; font-style:italic; color:rgba(255,255,255,.85); border-top:1px solid rgba(255,255,255,.3); padding-top:16px; margin-top:16px;}
+  .login-form-side{ flex:1.05; padding:44px 44px; display:flex; flex-direction:column; justify-content:center; min-width:320px; }
+  .login-brand{display:flex; align-items:center; gap:10px; margin-bottom:28px;}
+  .login-brand .brand-icon{width:34px; height:34px; border-radius:9px; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:16px;}
+  .login-brand-text{font-weight:800; font-size:14.5px;}
+  .login-brand-sub{font-size:10.5px; color:var(--text-faint); font-weight:600;}
+  .login-title{font-size:22px; font-weight:800; margin-bottom:6px;}
+  .login-sub{font-size:13px; color:var(--text-faint); margin-bottom:26px;}
+  .field-group{margin-bottom:16px;}
+  .field-label{font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:block;}
+  .field-input{
+    width:100%; background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+    color:var(--text); padding:11px 13px; font-size:13.5px; font-family:inherit;
+  }
+  .field-input:focus{outline:none; border-color:var(--accent-1);}
+  .login-row-between{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .login-link{font-size:12.5px; color:var(--accent-1); font-weight:700; cursor:pointer;}
+  .login-error{
+    background:var(--red-bg); color:var(--red); border-radius:var(--radius-sm);
+    padding:10px 12px; font-size:12.5px; font-weight:600; margin-bottom:16px; display:none;
+  }
+  .login-error.active{display:block;}
+  .login-success-msg{
+    background:var(--green-bg); color:var(--green); border-radius:var(--radius-sm);
+    padding:12px 14px; font-size:12.5px; font-weight:600; margin-bottom:16px; display:none; line-height:1.5;
+  }
+  .login-success-msg.active{display:block;}
+  .btn-full{width:100%;}
+  .login-toggle-row{margin-top:22px; text-align:center; font-size:12.5px; color:var(--text-faint);}
+  .login-demo-note{margin-top:18px; font-size:11px; color:var(--text-faint); background:var(--card-bg-2); border:1px dashed var(--border); border-radius:var(--radius-sm); padding:10px 12px; line-height:1.6;}
+  .back-to-login{font-size:12.5px; color:var(--accent-1); font-weight:700; cursor:pointer; margin-bottom:18px; display:inline-block;}
+  .admin-portal-link{ text-align:center; margin-top:16px; font-size:11.5px; color:var(--text-faint); }
+  .admin-portal-link a{ color:var(--text-muted); font-weight:700; cursor:pointer; }
+
+  /* ===================== LOGIN CAROUSEL ===================== */
+  .login-visual{ position:relative; }
+  .carousel-slides{ position:relative; flex:1; }
+  .carousel-slide{ position:absolute; inset:0; opacity:0; transform:translateX(14px); transition:opacity .5s ease, transform .5s ease; pointer-events:none; display:flex; flex-direction:column; justify-content:flex-start; }
+  .carousel-slide.active{ opacity:1; transform:translateX(0); pointer-events:auto; position:relative; }
+  .carousel-track{ position:relative; min-height:230px; }
+  .carousel-dots{ display:flex; gap:8px; margin-top:18px; }
+  .carousel-dot{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.4); cursor:pointer; transition:background .2s, width .2s; }
+  .carousel-dot.active{ background:#fff; width:20px; border-radius:5px; }
+  .carousel-arrows{ position:absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%); padding:0 2px; pointer-events:none; }
+  .carousel-arrow{ pointer-events:auto; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; transition:background .15s; }
+  .carousel-arrow:hover{ background:rgba(255,255,255,.3); }
+
+  /* ===================== PASSWORD TOGGLE ===================== */
+  .field-input-wrap{ position:relative; }
+  .field-input-wrap .field-input{ padding-right:40px; }
+  .pw-toggle{ position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--text-faint); font-size:14px; user-select:none; }
+  .pw-toggle:hover{ color:var(--text-muted); }
+
+  /* ===================== SIDEBAR COLLAPSE / DRAWER ===================== */
+  .sidebar{ transition:width .22s ease, min-width .22s ease, transform .22s ease; }
+  #appRoot.sidebar-collapsed .sidebar{ width:76px; min-width:76px; }
+  #appRoot.sidebar-collapsed .brand-text, #appRoot.sidebar-collapsed .nav-section-label,
+  #appRoot.sidebar-collapsed .nav-item span:not(.ic), #appRoot.sidebar-collapsed .logout-item span:not(.ic){ display:none; }
+  #appRoot.sidebar-collapsed .nav-item, #appRoot.sidebar-collapsed .logout-item{ justify-content:center; }
+  #appRoot.sidebar-collapsed .sidebar-brand{ justify-content:center; padding:20px 8px; }
+  .sidebar-backdrop{ display:none; position:fixed; inset:0; background:rgba(4,8,15,.55); z-index:39; }
+  .sidebar-backdrop.active{ display:block; }
+  @media (max-width: 880px){
+    .sidebar{ position:fixed; top:0; left:0; z-index:40; transform:translateX(-100%); width:266px; min-width:266px; }
+    #appRoot.mobile-drawer-open .sidebar{ transform:translateX(0); box-shadow:0 0 40px rgba(0,0,0,.4); }
+    #appRoot.sidebar-collapsed .sidebar{ width:266px; min-width:266px; }
+    #appRoot.sidebar-collapsed .brand-text, #appRoot.sidebar-collapsed .nav-section-label,
+    #appRoot.sidebar-collapsed .nav-item span:not(.ic), #appRoot.sidebar-collapsed .logout-item span:not(.ic){ display:inline; }
+    .stat-grid{ grid-template-columns:1fr; }
+    .row-grid{ grid-template-columns:1fr; }
+    .profile-grid{ grid-template-columns:1fr; }
+    .login-shell{ flex-direction:column; }
+    .login-visual{ min-width:auto; }
+  }
+
+  /* ===================== CONFIRM MODAL ===================== */
+  .confirm-text{ font-size:13.5px; line-height:1.6; color:var(--text-muted); margin:4px 0 4px; }
+
+  /* ===================== ADMIN PANEL ===================== */
+  .admin-badge{ display:inline-block; background:var(--indigo-bg); color:var(--indigo); font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; }
+  .admin-tabs{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .admin-tab{ padding:9px 16px; border-radius:var(--radius-sm); font-size:12.5px; font-weight:700; color:var(--text-muted); background:var(--card-bg-2); border:1px solid var(--border); cursor:pointer; }
+  .admin-tab.active{ background:var(--accent-grad); color:var(--accent-on); border-color:transparent; }
+  .admin-panel-view{ display:none; }
+  .admin-panel-view.active{ display:block; }
+  .mono-mask{ font-family:'SFMono-Regular', Consolas, monospace; letter-spacing:.5px; color:var(--text-faint); }
+  .qb-row{ display:flex; gap:8px; align-items:center; background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:8px; }
+  .qb-row input, .qb-row select{ flex:1; }
+  .qb-remove{ color:var(--red); cursor:pointer; font-weight:800; font-size:14px; padding:0 4px; }
+
+  /* ===================== APP SHELL ===================== */
+  #appRoot{display:none;}
+  #appRoot.active{display:flex;}
+  .sidebar{
+    width:266px; min-width:266px; background:var(--sidebar-bg); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; height:100vh; position:sticky; top:0;
+  }
+  .sidebar-brand{ display:flex; align-items:center; gap:12px; padding:20px 20px; border-bottom:1px solid var(--border); }
+  .brand-icon{ width:38px; height:38px; border-radius:10px; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .brand-text .brand-title{font-weight:700; font-size:15px; letter-spacing:.2px;}
+  .brand-text .brand-sub{font-size:11px; color:var(--text-faint); margin-top:1px;}
+  .nav-scroll{flex:1; overflow-y:auto; padding:16px 12px;}
+  .nav-section-label{ font-size:10.5px; letter-spacing:1px; color:var(--text-faint); font-weight:700; padding:14px 10px 8px; }
+  .nav-item{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); color:var(--text-muted); font-weight:500; cursor:pointer; margin-bottom:2px; transition:background .15s, color .15s; }
+  .nav-item:hover{background:var(--card-bg-2); color:var(--text);}
+  .nav-item.active{ background:var(--accent-1); color:var(--accent-on); font-weight:700; }
+  .nav-item .ic{width:18px; text-align:center; flex-shrink:0;}
+  .sidebar-footer{ padding:16px 12px; border-top:1px solid var(--border); }
+  .logout-item{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--radius-sm); color:var(--red); font-weight:600; cursor:pointer; }
+  .logout-item:hover{background:var(--red-bg);}
+
+  .main{flex:1; display:flex; flex-direction:column; min-width:0;}
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:16px 28px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:20; }
+  .topbar-left{display:flex; align-items:center; gap:16px;}
+  .hamburger{font-size:20px; color:var(--text-muted); cursor:pointer;}
+  .org-title{font-weight:700; font-size:15px;}
+  .org-sub{font-size:10.5px; letter-spacing:.5px; color:var(--text-faint); font-weight:600;}
+  .topbar-right{display:flex; align-items:center; gap:22px;}
+  .icon-btn-wrap{position:relative;}
+  .icon-btn{color:var(--text-muted); font-size:17px; cursor:pointer; position:relative; padding:6px; border-radius:8px; transition:background .15s;}
+  .icon-btn:hover{background:var(--card-bg-2);}
+  .badge-dot{ position:absolute; top:1px; right:1px; min-width:15px; height:15px; padding:0 3px; background:var(--red); color:#fff; border-radius:999px; font-size:9.5px; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .user-block{display:flex; align-items:center; gap:10px; cursor:pointer; padding:4px 8px 4px 4px; border-radius:10px; transition:background .15s;}
+  .user-block:hover{background:var(--card-bg-2);}
+  .user-name{font-weight:700; font-size:13px; text-align:right;}
+  .user-id{font-size:10.5px; color:var(--text-faint); text-align:right;}
+  .avatar{ width:34px; height:34px; border-radius:50%; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; overflow:hidden; flex-shrink:0; }
+  .avatar img{width:100%; height:100%; object-fit:cover;}
+
+  .content{padding:28px; overflow-y:auto; flex:1;}
+
+  .banner{ background: linear-gradient(120deg, var(--accent-1) 0%, var(--accent-2) 100%); border-radius:var(--radius-lg); padding:30px 36px; display:flex; align-items:center; gap:22px; margin-bottom:24px; position:relative; overflow:hidden; }
+  .banner-icon{ width:58px; height:58px; border-radius:14px; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+  .banner-eyebrow{font-size:11.5px; letter-spacing:1.5px; font-weight:700; color:rgba(255,255,255,.85); margin-bottom:6px;}
+  .banner-title{font-size:28px; font-weight:800; color:#fff; margin-bottom:6px;}
+  .banner-sub{font-size:13.5px; color:rgba(255,255,255,.92); margin-bottom:8px;}
+  .banner-quote{font-size:12.5px; font-style:italic; color:rgba(255,255,255,.85);}
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:24px; }
+  .stat-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 22px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:transform .12s, border-color .15s, box-shadow .15s; }
+  .stat-card:hover{ transform:translateY(-2px); border-color:var(--accent-1); box-shadow:0 8px 24px rgba(0,0,0,.18); }
+  .stat-card:active{ transform:translateY(0); }
+  .stat-icon{ width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+  .stat-icon.orange{background:var(--orange-bg); color:var(--orange);}
+  .stat-icon.green{background:var(--green-bg); color:var(--green);}
+  .stat-icon.indigo{background:var(--indigo-bg); color:var(--indigo);}
+  .stat-label{font-size:13px; color:var(--text-muted); font-weight:600; margin-bottom:4px;}
+  .stat-value{font-size:26px; font-weight:800;}
+
+  .row-grid{ display:grid; grid-template-columns: 1.7fr 1fr; gap:20px; align-items:start; }
+  .panel{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; }
+  .panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .panel-title{font-size:16px; font-weight:700;}
+  .btn{ border:none; cursor:pointer; font-weight:700; font-size:12.5px; border-radius:var(--radius-sm); padding:9px 16px; transition:opacity .15s, transform .1s; }
+  .btn:active{transform:scale(.97);}
+  .btn-link{ background:var(--accent-soft-bg); color:var(--accent-1); padding:8px 14px; }
+  .btn-primary{background:var(--accent-grad); color:var(--accent-on);}
+  .btn-primary:hover{opacity:.92;}
+  .btn-primary:disabled{opacity:.5; cursor:not-allowed;}
+  .btn-ghost{background:transparent; border:1px solid var(--border); color:var(--text-muted);}
+
+  .feedback-item{ display:flex; align-items:center; gap:14px; background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px 18px; margin-bottom:12px; cursor:pointer; transition:border-color .15s; }
+  .feedback-item:hover{border-color:var(--accent-1);}
+  .feedback-item:last-child{margin-bottom:0;}
+  .fb-icon{ width:38px; height:38px; border-radius:10px; background:var(--indigo-bg); color:var(--indigo); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .fb-body{flex:1; min-width:0;}
+  .fb-badge{ display:inline-block; background:var(--accent-soft-bg); color:var(--accent-1); font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; margin-right:10px; vertical-align:middle; }
+  .fb-title{font-weight:700; font-size:14px; vertical-align:middle;}
+  .fb-right{text-align:right; flex-shrink:0;}
+  .fb-due{font-size:11.5px; color:var(--text-faint); margin-bottom:8px;}
+
+  .progress-wrap{display:flex; flex-direction:column; align-items:center; padding:10px 0 4px; cursor:pointer;}
+  .donut{position:relative; width:190px; height:190px;}
+  .donut svg{transform:rotate(-90deg);}
+  .donut-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .donut-pct{font-size:28px; font-weight:800;}
+  .donut-label{font-size:10.5px; letter-spacing:1px; color:var(--text-faint); font-weight:700; margin-top:2px;}
+  .donut-hint{font-size:11px; color:var(--text-faint); margin-top:10px;}
+
+  .list-card{ background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px 18px; margin-bottom:12px; display:flex; align-items:center; gap:14px; }
+  .list-card:last-child{margin-bottom:0;}
+
+  table{width:100%; border-collapse:collapse;}
+  th{ text-align:left; font-size:11px; letter-spacing:.5px; color:var(--text-faint); font-weight:700; padding:10px 14px; border-bottom:1px solid var(--border); }
+  td{padding:14px; border-bottom:1px solid var(--border); font-size:13.5px;}
+  tr:last-child td{border-bottom:none;}
+  .status-pill{ padding:4px 11px; border-radius:999px; font-size:11px; font-weight:700; display:inline-block; }
+  .status-submitted{background:var(--green-bg); color:var(--green);}
+  .status-pending{background:var(--orange-bg); color:var(--orange);}
+
+  .profile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px 32px; }
+  .profile-field{border-bottom:1px solid var(--border); padding-bottom:14px;}
+  .profile-field-label{font-size:11px; color:var(--text-faint); font-weight:700; letter-spacing:.5px; margin-bottom:6px;}
+  .profile-field-value{font-size:14.5px; font-weight:600;}
+  .profile-header{display:flex; align-items:center; gap:18px; margin-bottom:26px;}
+  .profile-avatar{ width:76px; height:76px; border-radius:50%; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; color:#fff; cursor:pointer; position:relative; overflow:hidden; flex-shrink:0; }
+  .profile-avatar img{width:100%; height:100%; object-fit:cover;}
+  .profile-avatar-edit{ position:absolute; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:700; opacity:0; transition:opacity .15s; }
+  .profile-avatar:hover .profile-avatar-edit{opacity:1;}
+  .profile-name{font-size:20px; font-weight:800;}
+  .profile-role{font-size:13px; color:var(--text-muted); margin-top:2px;}
+
+  .section-title{font-size:20px; font-weight:800; margin-bottom:20px;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .footer-bar{ padding:14px 28px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-faint); }
+
+  /* Modal */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(4,8,15,.7); display:none; align-items:center; justify-content:center; z-index:100; backdrop-filter: blur(2px); }
+  .modal-overlay.active{display:flex;}
+  .modal{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); width:560px; max-width:92vw; max-height:86vh; overflow-y:auto; padding:26px 28px; }
+  .modal-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
+  .modal-title{font-size:18px; font-weight:800;}
+  .modal-close{cursor:pointer; color:var(--text-muted); font-size:20px; line-height:1;}
+  .modal-sub{font-size:12.5px; color:var(--text-faint); margin-bottom:20px;}
+  .q-block{margin-bottom:18px;}
+  .q-label{font-size:13.5px; font-weight:600; margin-bottom:8px;}
+  .q-required{color:var(--red); margin-left:3px;}
+  textarea, select, input[type=text]{ width:100%; background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); padding:10px 12px; font-size:13.5px; font-family:inherit; }
+  textarea{resize:vertical; min-height:70px;}
+  .rating-row{display:flex; gap:8px;}
+  .rating-opt{ flex:1; text-align:center; padding:9px 0; border-radius:var(--radius-sm); border:1px solid var(--border); cursor:pointer; font-weight:700; color:var(--text-muted); font-size:13px; }
+  .rating-opt.selected{background:var(--accent-1); color:var(--accent-on); border-color:var(--accent-1);}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:22px;}
+  .toast{ position:fixed; bottom:24px; right:24px; background:var(--green); color:#04261a; padding:14px 20px; border-radius:var(--radius-md); font-weight:700; font-size:13.5px; display:none; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,.35); max-width:320px; }
+  .toast.active{display:block;}
+  .empty-state{text-align:center; padding:40px 20px; color:var(--text-faint);}
+  .empty-state .ic{font-size:32px; margin-bottom:10px;}
+
+  .notif-panel{ position:absolute; top:44px; right:0; width:340px; max-height:420px; overflow-y:auto; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:0 12px 32px rgba(0,0,0,.35); display:none; z-index:30; }
+  .notif-panel.active{display:block;}
+  .notif-head{ padding:14px 16px; border-bottom:1px solid var(--border); font-weight:700; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;}
+  .notif-mark{font-size:11px; color:var(--accent-1); cursor:pointer; font-weight:700;}
+  .notif-item{ display:flex; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; }
+  .notif-item:hover{background:var(--card-bg-2);}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item.unread{background:var(--accent-soft-bg);}
+  .notif-dot{width:8px; height:8px; border-radius:50%; background:var(--accent-1); margin-top:5px; flex-shrink:0;}
+  .notif-item.read .notif-dot{background:transparent;}
+  .notif-title{font-size:12.5px; font-weight:700; margin-bottom:2px;}
+  .notif-time{font-size:10.5px; color:var(--text-faint);}
+
+  .settings-block{margin-bottom:26px;}
+  .settings-block-title{font-size:13.5px; font-weight:700; margin-bottom:12px;}
+  .theme-options{display:flex; gap:12px;}
+  .theme-opt{ flex:1; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:14px; cursor:pointer; text-align:center; font-weight:600; font-size:13px; color:var(--text-muted); transition:border-color .15s, color .15s; }
+  .theme-opt.active{border-color:var(--accent-1); color:var(--accent-1); background:var(--accent-soft-bg);}
+  .palette-row{display:flex; gap:16px;}
+  .palette-swatch{ width:44px; height:44px; border-radius:50%; cursor:pointer; position:relative; border:2px solid transparent; display:flex; align-items:center; justify-content:center; transition:border-color .15s; }
+  .palette-swatch.active{border-color:var(--text);}
+  .palette-swatch .check{color:#fff; font-size:16px; font-weight:900; display:none;}
+  .palette-swatch.active .check{display:block;}
+  .palette-label{font-size:10.5px; color:var(--text-faint); text-align:center; margin-top:6px;}
+  .palette-item{display:flex; flex-direction:column; align-items:center;}
+
+  .otp-input-row{display:flex; gap:8px; justify-content:center; margin:16px 0;}
+  .otp-box{ width:42px; height:50px; text-align:center; font-size:20px; font-weight:800; }
+  .otp-meta{text-align:center; font-size:12px; color:var(--text-faint); margin-bottom:6px;}
+  .otp-resend{text-align:center; font-size:12px; margin-top:10px;}
+  .otp-resend a{color:var(--accent-1); font-weight:700; cursor:pointer;}
+  .otp-resend .disabled{color:var(--text-faint); cursor:default;}
+  .photo-preview{ width:96px; height:96px; border-radius:50%; margin:0 auto 16px; overflow:hidden; background:var(--card-bg-2); display:flex; align-items:center; justify-content:center; border:1px solid var(--border);}
+  .photo-preview img{width:100%; height:100%; object-fit:cover;}
+
+  /* Success screen */
+  .success-screen{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:70px 20px; position:relative; overflow:hidden; min-height:60vh; }
+  .success-emoji{font-size:52px; margin-bottom:18px;}
+  .success-title{font-size:26px; font-weight:800; margin-bottom:12px;}
+  .success-msg{font-size:14.5px; color:var(--text-muted); max-width:480px; line-height:1.7; margin-bottom:8px;}
+  .success-form-name{font-size:12.5px; color:var(--text-faint); margin-bottom:30px;}
+  .success-actions{display:flex; gap:12px;}
+  .confetti-piece{ position:absolute; top:-12px; width:8px; height:14px; opacity:.9; border-radius:2px; animation:confetti-fall linear forwards; }
+  @keyframes confetti-fall{
+    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(340px) rotate(340deg); opacity:0; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ============================================================
+     LOGIN SCREEN (separate authentication surface)
+     ============================================================ -->
+<div id="loginScreen">
+  <div class="login-shell">
+    <div class="login-visual">
+      <div class="carousel-track">
+        <div class="carousel-slides" id="carouselSlides"></div>
+        <div class="carousel-arrows">
+          <div class="carousel-arrow" id="carouselPrev">‹</div>
+          <div class="carousel-arrow" id="carouselNext">›</div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+
+    <!-- LOGIN FORM VIEW -->
+    <div class="login-form-side" id="loginFormView">
+      <div class="login-brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <div class="login-brand-text">AFMS</div>
+          <div class="login-brand-sub">ALUMNI PORTAL</div>
+        </div>
+      </div>
+      <div class="login-title">Alumni Login</div>
+      <div class="login-sub">Sign in with your registered college email or phone number.</div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <div class="field-group">
+        <label class="field-label">Email or Phone Number</label>
+        <input type="text" class="field-input" id="loginIdentifier" placeholder="you@college.edu or +91 98765 43210">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="field-input-wrap">
+          <input type="password" class="field-input" id="loginPassword" placeholder="••••••••">
+          <span class="pw-toggle" data-toggle-for="loginPassword">👁</span>
+        </div>
+      </div>
+      <div class="login-row-between">
+        <span></span>
+        <span class="login-link" id="forgotPasswordLink">Forgot Password?</span>
+      </div>
+      <button class="btn btn-primary btn-full" id="loginSubmitBtn" style="padding:12px 0;">Log In</button>
+
+      <div class="login-demo-note" id="demoCredsNote">Loading demo credentials…</div>
+      <div class="admin-portal-link">Are you an administrator? <a id="goToAdminLogin">Admin Login</a></div>
+    </div>
+
+    <!-- FORGOT PASSWORD VIEW -->
+    <div class="login-form-side" id="forgotFormView" style="display:none;">
+      <span class="back-to-login" id="backToLoginLink">← Back to Login</span>
+
+      <!-- STEP 1: enter identifier -->
+      <div id="forgotStepIdentifier">
+        <div class="login-title">Reset Your Password</div>
+        <div class="login-sub">Enter the email or phone number registered to your Alumni account.</div>
+        <div class="login-error" id="forgotError"></div>
+        <div class="field-group">
+          <label class="field-label">Registered Email or Phone Number</label>
+          <input type="text" class="field-input" id="forgotIdentifier" placeholder="you@college.edu or +91 98765 43210">
+        </div>
+        <button class="btn btn-primary btn-full" id="forgotContinueBtn" style="padding:12px 0;">Continue</button>
+      </div>
+
+      <!-- CASE A — STEP 2: OTP verification (identifier matched an existing account) -->
+      <div id="forgotStepOtp" style="display:none;">
+        <div class="login-title">Verify Your Identity</div>
+        <div class="login-sub">We found your Alumni account. Enter the OTP sent to your registered contact to continue — no Admin approval needed.</div>
+        <div class="otp-meta" id="forgotOtpMeta">A 6-digit code was sent.</div>
+        <div class="otp-input-row">
+          <input class="otp-box fp-otp-box" maxlength="1" type="text"><input class="otp-box fp-otp-box" maxlength="1" type="text"><input class="otp-box fp-otp-box" maxlength="1" type="text">
+          <input class="otp-box fp-otp-box" maxlength="1" type="text"><input class="otp-box fp-otp-box" maxlength="1" type="text"><input class="otp-box fp-otp-box" maxlength="1" type="text">
+        </div>
+        <div class="otp-meta" id="forgotOtpTimer">Expires in 02:00</div>
+        <div class="otp-resend" id="forgotResendWrap">Didn't get it? <a id="forgotResendLink">Resend code</a></div>
+        <button class="btn btn-primary btn-full" id="forgotOtpVerifyBtn" style="padding:12px 0; margin-top:8px;">Verify Code</button>
+      </div>
+
+      <!-- CASE A — STEP 3: set new password -->
+      <div id="forgotStepNewPassword" style="display:none;">
+        <div class="login-title">Create New Password</div>
+        <div class="login-sub">Choose a new password for your Alumni account.</div>
+        <div class="login-error" id="forgotPwError"></div>
+        <div class="field-group">
+          <label class="field-label">New Password</label>
+          <div class="field-input-wrap">
+            <input type="password" class="field-input" id="forgotNewPassword" placeholder="••••••••">
+            <span class="pw-toggle" data-toggle-for="forgotNewPassword">👁</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Confirm New Password</label>
+          <div class="field-input-wrap">
+            <input type="password" class="field-input" id="forgotConfirmPassword" placeholder="••••••••">
+            <span class="pw-toggle" data-toggle-for="forgotConfirmPassword">👁</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" id="forgotSetPasswordBtn" style="padding:12px 0;">Update Password & Log In</button>
+      </div>
+
+      <!-- CASE B — identifier did not match: recover with a different contact (needs Admin approval) -->
+      <div id="forgotStepAltContact" style="display:none;">
+        <div class="login-title">We Couldn't Match That</div>
+        <div class="login-sub">No account uses that email or phone number. If you've lost access to your registered contact, submit a different one for Admin review.</div>
+        <div class="login-error" id="forgotAltError"></div>
+        <div class="field-group">
+          <label class="field-label">Your Full Name</label>
+          <input type="text" class="field-input" id="forgotAltName" placeholder="As registered with the college">
+        </div>
+        <div class="field-group">
+          <label class="field-label">New Email or Phone to Use</label>
+          <input type="text" class="field-input" id="forgotAltContact" placeholder="A contact we can reach you on">
+        </div>
+        <button class="btn btn-primary btn-full" id="forgotAltSubmitBtn" style="padding:12px 0;">Submit for Admin Review</button>
+        <button class="btn btn-ghost btn-full" id="forgotAltTryAgainBtn" style="padding:12px 0; margin-top:10px;">Try My Registered Contact Again</button>
+      </div>
+
+      <!-- CASE B — confirmation -->
+      <div id="forgotStepAltSuccess" style="display:none;">
+        <div class="login-title">Request Submitted</div>
+        <div class="login-success-msg active">Your recovery request has been sent to the Admin for review. A new email or phone number can't grant access on its own — you'll be notified once it's approved or rejected.</div>
+        <button class="btn btn-ghost btn-full" id="forgotAltDoneBtn" style="padding:12px 0;">Back to Login</button>
+      </div>
+
+      <div class="login-success-msg" id="forgotSuccess"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN LOGIN SCREEN (separate authentication surface)
+     ============================================================ -->
+<div id="adminLoginScreen" style="display:none;">
+  <div class="login-shell" style="width:760px;">
+    <div class="login-visual" style="flex:.85;">
+      <div>
+        <div class="login-visual-icon">🛡️</div>
+        <h2>Admin Console</h2>
+        <p>Manage Alumni records, recovery requests, and feedback forms for the Autonomous Feedback Management System.</p>
+      </div>
+    </div>
+    <div class="login-form-side">
+      <span class="back-to-login" id="backToAlumniLoginLink">← Back to Alumni Login</span>
+      <div class="login-brand">
+        <div class="brand-icon">🛡️</div>
+        <div><div class="login-brand-text">AFMS</div><div class="login-brand-sub">ADMIN PORTAL</div></div>
+      </div>
+      <div class="login-title">Admin Login</div>
+      <div class="login-sub">Sign in with your Admin credentials.</div>
+      <div class="login-error" id="adminLoginError"></div>
+      <div class="field-group">
+        <label class="field-label">Admin Email</label>
+        <input type="text" class="field-input" id="adminLoginEmail" placeholder="admin@college.edu">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="field-input-wrap">
+          <input type="password" class="field-input" id="adminLoginPassword" placeholder="••••••••">
+          <span class="pw-toggle" data-toggle-for="adminLoginPassword">👁</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" id="adminLoginSubmitBtn" style="padding:12px 0;">Log In</button>
+      <div class="login-demo-note">Demo credentials — Email: <strong>admin@college.edu</strong>, Password: <strong>Admin@123</strong>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP ROOT (protected — only shown when authenticated)
+     ============================================================ -->
+<div id="appRoot">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-text">
+        <div class="brand-title">AFMS</div>
+        <div class="brand-sub">Alumni Portal</div>
+      </div>
+    </div>
+    <div class="nav-scroll">
+      <div class="nav-item active" data-page="dashboard"><span class="ic">▦</span> Dashboard</div>
+      <div class="nav-item" data-page="profile"><span class="ic">👤</span> My Profile</div>
+      <div class="nav-section-label">FEEDBACK</div>
+      <div class="nav-item" data-page="available"><span class="ic">📋</span> Available Feedback</div>
+      <div class="nav-item" data-page="submissions"><span class="ic">🕘</span> My Submissions</div>
+      <div class="nav-section-label">UPDATES</div>
+      <div class="nav-item" data-page="announcements"><span class="ic">📣</span> Announcements</div>
+      <div class="nav-section-label">SYSTEM</div>
+      <div class="nav-item" data-page="settings"><span class="ic">⚙️</span> Settings</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="logout-item" id="logoutBtn"><span class="ic">↩</span> Logout</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="hamburger" id="hamburgerBtn">☰</span>
+        <div>
+          <div class="org-title">Autonomous College</div>
+          <div class="org-sub">ALUMNI PORTAL</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="icon-btn-wrap" id="notifWrap">
+          <span class="icon-btn" id="notifBtn">🔔<span class="badge-dot" id="notifBadge" style="display:none;">0</span></span>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-head"><span>Notifications</span><span class="notif-mark" id="notifMarkAll">Mark all read</span></div>
+            <div id="notifList"></div>
+          </div>
+        </div>
+        <div class="user-block" id="userBlock">
+          <div>
+            <div class="user-name" id="topbarName">—</div>
+            <div class="user-id" id="topbarId">—</div>
+          </div>
+          <div class="avatar" id="topbarAvatar">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="banner">
+          <div class="banner-icon">📖</div>
+          <div>
+            <div class="banner-eyebrow">ALUMNI DASHBOARD</div>
+            <div class="banner-title">Welcome back, <span id="bannerName">—</span>!</div>
+            <div class="banner-sub">Your experience and feedback help us improve our college.</div>
+            <div class="banner-quote" id="bannerQuote">"Once a part of our college, always a part of its story."</div>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card" id="cardPending">
+            <div class="stat-icon orange">🕘</div>
+            <div><div class="stat-label">Pending Feedback</div><div class="stat-value" id="statPending">0</div></div>
+          </div>
+          <div class="stat-card" id="cardSubmitted">
+            <div class="stat-icon green">✅</div>
+            <div><div class="stat-label">Feedback Submitted</div><div class="stat-value" id="statSubmitted">0</div></div>
+          </div>
+          <div class="stat-card" id="cardAnnouncements">
+            <div class="stat-icon indigo">📣</div>
+            <div><div class="stat-label">Announcements</div><div class="stat-value" id="statAnnouncements">0</div></div>
+          </div>
+        </div>
+
+        <div class="row-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Priority Feedback</div>
+              <div class="btn btn-link" data-page-link="available">View All</div>
+            </div>
+            <div id="priorityFeedbackList"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:6px;">Feedback Participation</div>
+            <div class="progress-wrap" id="progressWrap">
+              <div class="donut">
+                <svg width="190" height="190" viewBox="0 0 190 190">
+                  <circle cx="95" cy="95" r="82" fill="none" stroke="var(--border)" stroke-width="16"/>
+                  <circle id="donutRing" cx="95" cy="95" r="82" fill="none" stroke="var(--accent-1)" stroke-width="16" stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center"><div class="donut-pct" id="donutPct">0%</div><div class="donut-label">COMPLETED</div></div>
+              </div>
+              <div class="donut-hint">Tap for a breakdown</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="section-title">My Profile</div>
+        <div class="panel">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">—<div class="profile-avatar-edit">CHANGE</div></div>
+            <div><div class="profile-name" id="profileName">—</div><div class="profile-role" id="profileRole">—</div></div>
+          </div>
+          <div class="profile-grid" id="profileGrid"></div>
+        </div>
+      </div>
+
+      <!-- AVAILABLE FEEDBACK -->
+      <div class="page" id="page-available">
+        <div class="section-title">Available Feedback</div>
+        <div class="panel"><div id="availableFeedbackList"></div></div>
+      </div>
+
+      <!-- MY SUBMISSIONS -->
+      <div class="page" id="page-submissions">
+        <div class="section-title">My Submissions</div>
+        <div class="panel">
+          <table><thead><tr><th>Feedback Form</th><th>Submission Date</th><th>Status</th></tr></thead><tbody id="submissionsTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="page" id="page-announcements">
+        <div class="section-title">Announcements</div>
+        <div class="panel" id="announcementsList"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="section-title">Settings</div>
+        <div class="panel">
+          <div class="settings-block">
+            <div class="settings-block-title">Appearance</div>
+            <div class="theme-options" id="themeOptions">
+              <div class="theme-opt" data-theme-opt="light">☀️ Light</div>
+              <div class="theme-opt" data-theme-opt="dark">🌙 Dark</div>
+              <div class="theme-opt" data-theme-opt="system">🖥️ System</div>
+            </div>
+          </div>
+          <div class="settings-block">
+            <div class="settings-block-title">Accent Color</div>
+            <div class="palette-row" id="paletteRow"></div>
+          </div>
+          <div class="settings-block">
+            <div class="settings-block-title">Notifications</div>
+            <div style="font-size:12.5px; color:var(--text-faint);">Receive an email when new feedback forms are released to Alumni.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS SCREEN (after feedback submission) -->
+      <div class="page" id="page-success">
+        <div class="panel success-screen" id="successScreenPanel">
+          <div class="success-emoji">🎉✨</div>
+          <div class="success-title">Thank You for Your Response!</div>
+          <div class="success-msg">Your experience and insights help us shape a better future for the college and the generations to come.</div>
+          <div class="success-form-name" id="successFormName"></div>
+          <div class="success-actions">
+            <button class="btn btn-ghost" id="successViewSubmissions">View My Submissions</button>
+            <button class="btn btn-primary" id="successBackDashboard">Back to Dashboard</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bar">
+      <div>© 2026 Autonomous Feedback Management System — Autonomous College</div>
+      <div>Alumni Portal v3.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="modalTitle">Feedback Form</div><div class="modal-close" id="modalClose">✕</div></div>
+    <div class="modal-sub" id="modalSub">Due date</div>
+    <div id="modalQuestions"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" id="modalCancel">Cancel</button><button class="btn btn-primary" id="modalSubmit">Submit Feedback</button></div>
+  </div>
+</div>
+
+<!-- PROGRESS BREAKDOWN MODAL -->
+<div class="modal-overlay" id="progressModalOverlay">
+  <div class="modal" style="width:460px;">
+    <div class="modal-head"><div class="modal-title">Feedback Participation</div><div class="modal-close" id="progressModalClose">✕</div></div>
+    <div class="modal-sub">Submitted vs. assigned feedback forms</div>
+    <div id="progressBreakdown"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" id="progressModalDone">Close</button></div>
+  </div>
+</div>
+
+<!-- CHANGE PHOTO MODAL -->
+<div class="modal-overlay" id="photoModalOverlay">
+  <div class="modal" style="width:420px;">
+    <div class="modal-head"><div class="modal-title">Change Profile Photo</div><div class="modal-close" id="photoModalClose">✕</div></div>
+    <div class="modal-sub">Choose a new photo. You'll verify with an OTP before it's applied.</div>
+    <div class="photo-preview" id="photoPreview">📷</div>
+    <input type="file" accept="image/*" id="photoFileInput" style="margin:0 auto; display:block;">
+    <div class="modal-actions"><button class="btn btn-ghost" id="photoModalCancel">Cancel</button><button class="btn btn-primary" id="photoModalNext" disabled>Update Photo</button></div>
+  </div>
+</div>
+
+<!-- OTP MODAL -->
+<div class="modal-overlay" id="otpModalOverlay">
+  <div class="modal" style="width:400px;">
+    <div class="modal-head"><div class="modal-title">Verify OTP</div><div class="modal-close" id="otpModalClose">✕</div></div>
+    <div class="otp-meta" id="otpMeta">A 6-digit code was sent to your registered email.</div>
+    <div class="otp-input-row">
+      <input class="otp-box" maxlength="1" type="text"><input class="otp-box" maxlength="1" type="text"><input class="otp-box" maxlength="1" type="text">
+      <input class="otp-box" maxlength="1" type="text"><input class="otp-box" maxlength="1" type="text"><input class="otp-box" maxlength="1" type="text">
+    </div>
+    <div class="otp-meta" id="otpTimer">Expires in 02:00</div>
+    <div class="otp-resend" id="otpResendWrap">Didn't get it? <a id="otpResendLink">Resend code</a></div>
+    <div class="modal-actions"><button class="btn btn-ghost" id="otpCancel">Cancel</button><button class="btn btn-primary" id="otpVerify">Verify & Update</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM SUBMIT MODAL -->
+<div class="modal-overlay" id="confirmSubmitOverlay">
+  <div class="modal" style="width:420px;">
+    <div class="modal-head"><div class="modal-title">Submit Feedback?</div><div class="modal-close" id="confirmSubmitClose">✕</div></div>
+    <div class="confirm-text">Are you sure you want to submit your response? You won't be able to edit it after submission.</div>
+    <div class="modal-actions"><button class="btn btn-ghost" id="confirmSubmitCancel">Go Back</button><button class="btn btn-primary" id="confirmSubmitYes">Yes, Submit</button></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN ROOT (protected — Admin session only)
+     ============================================================ -->
+<div id="adminRoot" style="display:none;">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-text"><div class="brand-title">AFMS</div><div class="brand-sub">Admin Portal</div></div>
+    </div>
+    <div class="nav-scroll">
+      <div class="nav-item active" data-admin-page="alumni"><span class="ic">🎓</span> Alumni Records</div>
+      <div class="nav-item" data-admin-page="recovery"><span class="ic">🔑</span> Recovery Requests</div>
+      <div class="nav-item" data-admin-page="feedback"><span class="ic">📋</span> Feedback Forms</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="logout-item" id="adminLogoutBtn"><span class="ic">↩</span> Logout</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="org-title">Autonomous College</div>
+          <div class="org-sub">ADMIN CONSOLE</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="admin-badge">🛡️ Administrator</span>
+      </div>
+    </div>
+    <div class="content">
+      <div class="admin-panel-view active" id="admin-page-alumni">
+        <div class="section-title">Alumni Records</div>
+        <div class="panel">
+          <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Batch</th><th>Department</th></tr></thead><tbody id="adminAlumniTable"></tbody></table>
+        </div>
+      </div>
+      <div class="admin-panel-view" id="admin-page-recovery">
+        <div class="section-title">Password Recovery Requests</div>
+        <div class="panel"><div id="adminRecoveryList"></div></div>
+      </div>
+      <div class="admin-panel-view" id="admin-page-feedback">
+        <div class="section-title">Feedback Forms</div>
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-head"><div class="panel-title">Released to Alumni</div><button class="btn btn-primary" id="adminCreateFormBtn">+ Create Feedback Form</button></div>
+          <div id="adminFormsList"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div>© 2026 Autonomous Feedback Management System — Admin Console</div>
+      <div>Demo data is in-memory only. Wire this panel to the real Admin/database layer to persist changes.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: CREATE FEEDBACK FORM MODAL -->
+<div class="modal-overlay" id="adminFormModalOverlay">
+  <div class="modal" style="width:600px;">
+    <div class="modal-head"><div class="modal-title">Create Feedback Form</div><div class="modal-close" id="adminFormModalClose">✕</div></div>
+    <div class="modal-sub">Target audience: Alumni. Released forms appear instantly on Alumni dashboards.</div>
+    <div class="q-block">
+      <div class="q-label">Form Title</div>
+      <input type="text" id="adminFormTitle" placeholder="e.g. Alumni Engagement Survey 2026">
+    </div>
+    <div class="q-block">
+      <div class="q-label">Due Date</div>
+      <input type="text" id="adminFormDueDate" placeholder="YYYY-MM-DD">
+    </div>
+    <div class="q-block">
+      <div class="q-label">Questions</div>
+      <div id="adminQuestionsBuilder"></div>
+      <button class="btn btn-ghost" id="adminAddQuestionBtn" style="margin-top:6px;">+ Add Question</button>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" id="adminFormModalCancel">Cancel</button><button class="btn btn-primary" id="adminFormReleaseBtn">Release to Alumni</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Feedback submitted successfully.</div>
+
+<script>
+/* =========================================================
+   MOCK DATA / SERVICE LAYER
+   -----------------------------------------------------------
+   Everything below simulates calls the real AFMS codebase
+   already has. Swap each block for the actual service:
+     - AuthService.login(identifier, password) / logout() / getSession()
+     - AuthService.requestPasswordReset(identifier) -> Admin approval queue
+     - FeedbackService.getFormsForAudience("alumni")
+     - FeedbackService.submitResponse(formId, answers)
+     - NotificationService.getForUser(userId)
+     - OtpService.send(...) / OtpService.verify(...)
+     - ThemeService.get()/set()
+   No parallel/disconnected auth, database, or OTP system is
+   introduced — this file only adds the "alumni" role/audience
+   on top of the existing student architecture.
+   ========================================================= */
+
+// Registered Alumni directory (stand-in for the existing user table).
+// Only accounts present here — i.e. already registered/approved — can log in.
+const registeredAlumni = [
+  {
+    id: "ALM014", role: "alumni",
+    email: "diego.alonso@example.com", phone: "+91 98765 43210",
+    password: "Alumni@123", // demo only — production verifies a hashed credential via AuthService
+    fullName: "Diego Alonso", graduationYear: "2019", department: "Computer Science & Engineering",
+    degree: "B.Tech", batch: "2015 - 2019", organization: "Nimbus Cloud Systems", designation: "Senior Software Engineer", photo: null
+  },
+  {
+    id: "ALM021", role: "alumni",
+    email: "priya.nair@example.com", phone: "+91 98123 45671",
+    password: "Alumni@123",
+    fullName: "Priya Nair", graduationYear: "2020", department: "Electronics & Communication",
+    degree: "B.Tech", batch: "2016 - 2020", organization: "Vertex Semiconductors", designation: "Hardware Design Engineer", photo: null
+  },
+  {
+    id: "ALM032", role: "alumni",
+    email: "michael.tan@example.com", phone: "+91 98123 45672",
+    password: "Alumni@123",
+    fullName: "Michael Tan", graduationYear: "2018", department: "Mechanical Engineering",
+    degree: "B.E.", batch: "2014 - 2018", organization: "Orion Manufacturing", designation: "Product Design Lead", photo: null
+  },
+  {
+    id: "ALM045", role: "alumni",
+    email: "ayesha.khan@example.com", phone: "+91 98123 45673",
+    password: "Alumni@123",
+    fullName: "Ayesha Khan", graduationYear: "2021", department: "Computer Science & Engineering",
+    degree: "M.Tech", batch: "2019 - 2021", organization: "Fluxion Analytics", designation: "Data Scientist", photo: null
+  },
+  {
+    id: "ALM057", role: "alumni",
+    email: "daniel.osei@example.com", phone: "+91 98123 45674",
+    password: "Alumni@123",
+    fullName: "Daniel Osei", graduationYear: "2017", department: "Civil Engineering",
+    degree: "B.Tech", batch: "2013 - 2017", organization: "Meridian Infra Group", designation: "Project Manager", photo: null
+  }
+];
+
+// Admin directory (stand-in for the existing Admin user table).
+const registeredAdmins = [
+  { id: "ADM001", role: "admin", email: "admin@college.edu", password: "Admin@123", fullName: "System Admin" }
+];
+
+// Password reset requests awaiting Admin approval (existing recovery/approval architecture).
+let passwordResetRequests = [];
+
+// Feedback forms released by Admin with audience = "alumni".
+// Questions/deadlines/content are fully Admin-controlled — never hardcoded per role.
+let feedbackForms = [
+  {
+    id: "FB-101", title: "Curriculum Relevance Survey 2026", dueDate: "2026-07-28",
+    audience: "alumni", submitted: false,
+    questions: [
+      { id: "q1", type: "rating", label: "How relevant was the curriculum to your current job role?" },
+      { id: "q2", type: "text", label: "What skills do you wish were covered more during your program?" },
+      { id: "q3", type: "select", label: "Would you recommend this program to others?", options: ["Yes", "No", "Maybe"] }
+    ]
+  },
+  {
+    id: "FB-102", title: "Alumni Placement Experience", dueDate: "2026-08-02",
+    audience: "alumni", submitted: false,
+    questions: [
+      { id: "q1", type: "rating", label: "How would you rate the placement cell's support?" },
+      { id: "q2", type: "text", label: "Any suggestions to improve career services for current students?" }
+    ]
+  },
+  {
+    id: "FB-090", title: "Alumni Meet 2025 Feedback", dueDate: "2025-12-10",
+    audience: "alumni", submitted: true, submittedOn: "2025-12-08",
+    questions: [{ id: "q1", type: "rating", label: "How would you rate the event overall?" }]
+  },
+  {
+    id: "FB-085", title: "Mentorship Program Review", dueDate: "2025-10-15",
+    audience: "alumni", submitted: true, submittedOn: "2025-10-12",
+    questions: [{ id: "q1", type: "text", label: "How was your mentorship experience?" }]
+  },
+  {
+    id: "FB-080", title: "Infrastructure & Campus Feedback", dueDate: "2025-08-20",
+    audience: "alumni", submitted: true, submittedOn: "2025-08-18",
+    questions: [{ id: "q1", type: "rating", label: "Rate the campus infrastructure." }]
+  },
+  {
+    id: "FB-075", title: "Guest Lecture Series Feedback", dueDate: "2025-05-05",
+    audience: "alumni", submitted: true, submittedOn: "2025-05-03",
+    questions: [{ id: "q1", type: "text", label: "Which guest lecture did you find most valuable?" }]
+  }
+];
+
+const announcements = [
+  { title: "Alumni Meet 2026 — Save the Date", date: "Jul 18, 2026", body: "Join us on campus this December for the annual alumni gathering." },
+  { title: "New Feedback Cycle Open", date: "Jul 15, 2026", body: "The curriculum relevance survey is now open for alumni responses." },
+  { title: "Mentorship Program Applications", date: "Jun 30, 2026", body: "Sign up to mentor current students in your field." }
+];
+
+let notifications = [
+  { id: "n1", icon: "📋", title: "New feedback form released: Curriculum Relevance Survey 2026", time: "2h ago", read: false, page: "available" },
+  { id: "n2", icon: "⏰", title: "Deadline approaching: Alumni Placement Experience due Aug 2", time: "1d ago", read: false, page: "available" },
+  { id: "n3", icon: "📣", title: "New announcement: Alumni Meet 2026 — Save the Date", time: "3d ago", read: true, page: "announcements" },
+];
+
+// Login carousel slides (Admin-editable content in production).
+const carouselSlides = [
+  { icon: "🎓", title: "Once a part of our college, always a part of its story.", quote: "Your journey began here. Your experience can help shape what comes next." },
+  { icon: "🌟", title: "Every memory here shaped the path you walk today.", quote: "The friendships, the lessons, the late nights — they built who you've become." },
+  { icon: "🌱", title: "Your growth didn't stop at graduation.", quote: "Share how far you've come, and help the next generation go further." },
+  { icon: "🤝", title: "Give back to the place that gave you a start.", quote: "A few minutes of your feedback helps shape a better college for tomorrow's students." }
+];
+
+const palettes = {
+  teal:    { name: "Teal",    a1: "#12b9c9", a2: "#1691d9" },
+  indigo:  { name: "Indigo",  a1: "#6366f1", a2: "#818cf8" },
+  emerald: { name: "Emerald", a1: "#10b981", a2: "#34d399" },
+  rose:    { name: "Rose",    a1: "#f43f5e", a2: "#fb7185" }
+};
+
+// Admin-configurable dashboard copy (would come from a "dashboard content" table in production).
+let dashboardContent = {
+  headline: "Once a part of our college, always a part of its story."
+};
+
+let appSettings = { theme: "dark", palette: "teal" };
+
+/* ---------- SESSION STATE ---------- */
+let session = { isAuthenticated: false, user: null };
+let currentAlumni = null;
+let adminSession = { isAuthenticated: false, user: null };
+
+/* ========================================================= */
+
+function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+function initials(name){ return name.split(' ').map(p=>p[0]).slice(0,1).join('').toUpperCase(); }
+function formatDate(d){ const dt = new Date(d); return dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' }); }
+function alumniForms(){ return feedbackForms.filter(f => f.audience === "alumni"); }
+function normalize(v){ return (v||'').trim().toLowerCase(); }
+
+/* ---------- LOGIN CAROUSEL ---------- */
+let carouselIndex = 0;
+let carouselInterval = null;
+function buildCarousel(){
+  const slidesWrap = document.getElementById('carouselSlides');
+  const dotsWrap = document.getElementById('carouselDots');
+  slidesWrap.innerHTML = '';
+  dotsWrap.innerHTML = '';
+  carouselSlides.forEach((s, i)=>{
+    slidesWrap.appendChild(el(`
+      <div class="carousel-slide ${i===0?'active':''}" data-slide="${i}">
+        <div class="login-visual-icon">${s.icon}</div>
+        <h2>${s.title}</h2>
+        <div class="login-visual-quote">"${s.quote}"</div>
+      </div>
+    `));
+    const dot = el(`<div class="carousel-dot ${i===0?'active':''}" data-dot="${i}"></div>`);
+    dot.addEventListener('click', ()=> goToSlide(i));
+    dotsWrap.appendChild(dot);
+  });
+}
+function goToSlide(i){
+  carouselIndex = (i + carouselSlides.length) % carouselSlides.length;
+  document.querySelectorAll('.carousel-slide').forEach(s=> s.classList.toggle('active', Number(s.getAttribute('data-slide')) === carouselIndex));
+  document.querySelectorAll('.carousel-dot').forEach(d=> d.classList.toggle('active', Number(d.getAttribute('data-dot')) === carouselIndex));
+  restartCarouselTimer();
+}
+function restartCarouselTimer(){
+  clearInterval(carouselInterval);
+  carouselInterval = setInterval(()=> goToSlide(carouselIndex+1), 5000);
+}
+document.getElementById('carouselNext').addEventListener('click', ()=> goToSlide(carouselIndex+1));
+document.getElementById('carouselPrev').addEventListener('click', ()=> goToSlide(carouselIndex-1));
+
+/* ---------- PASSWORD VISIBILITY TOGGLE (generic) ---------- */
+document.querySelectorAll('.pw-toggle').forEach(icon=>{
+  icon.addEventListener('click', ()=>{
+    const input = document.getElementById(icon.getAttribute('data-toggle-for'));
+    if(!input) return;
+    const nowVisible = input.type === 'password';
+    input.type = nowVisible ? 'text' : 'password';
+    icon.textContent = nowVisible ? '🙈' : '👁';
+  });
+});
+
+/* ---------- AUTH ---------- */
+function attemptLogin(identifier, password){
+  const idNorm = normalize(identifier);
+  const match = registeredAlumni.find(u =>
+    (normalize(u.email) === idNorm || normalize(u.phone) === idNorm)
+  );
+  if(!match) return { ok:false, error: "No registered Alumni account found for that email or phone number." };
+  if(match.role !== 'alumni') return { ok:false, error: "This account is not registered with Alumni access." };
+  if(match.password !== password) return { ok:false, error: "Incorrect password. Please try again." };
+  return { ok:true, user: match };
+}
+
+function loginSuccess(user){
+  session.isAuthenticated = true;
+  session.user = user;
+  currentAlumni = user;
+  document.getElementById('loginError').classList.remove('active');
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').classList.add('active');
+  showPage('dashboard');
+  renderAll();
+  history.pushState({ view: 'app' }, '', '#dashboard');
+}
+
+function logout(){
+  session.isAuthenticated = false;
+  session.user = null;
+  currentAlumni = null;
+  document.getElementById('appRoot').classList.remove('active');
+  document.getElementById('loginScreen').style.display = 'flex';
+  showLoginFormView();
+  document.getElementById('loginIdentifier').value = '';
+  document.getElementById('loginPassword').value = '';
+  history.pushState({ view: 'login' }, '', '#login');
+}
+
+// Guard: protected app is never shown without an active session, including via
+// direct URL/hash access or the browser back button restoring a cached view.
+function enforceAuthGuard(){
+  document.getElementById('adminRoot').style.display = 'none';
+  document.getElementById('adminLoginScreen').style.display = 'none';
+  if(adminSession.isAuthenticated){
+    document.getElementById('appRoot').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminRoot').style.display = 'flex';
+    return;
+  }
+  if(session.isAuthenticated){
+    document.getElementById('appRoot').classList.add('active');
+    document.getElementById('loginScreen').style.display = 'none';
+  } else {
+    document.getElementById('appRoot').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'flex';
+    showLoginFormView();
+    buildCarousel(); restartCarouselTimer();
+  }
+}
+window.addEventListener('popstate', enforceAuthGuard);
+
+/* ---------- ADMIN AUTH + PORTAL SWITCHING ---------- */
+document.getElementById('goToAdminLogin').addEventListener('click', ()=>{
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminLoginScreen').style.display = 'flex';
+});
+document.getElementById('backToAlumniLoginLink').addEventListener('click', ()=>{
+  document.getElementById('adminLoginScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+});
+document.getElementById('adminLoginSubmitBtn').addEventListener('click', ()=>{
+  const email = document.getElementById('adminLoginEmail').value;
+  const password = document.getElementById('adminLoginPassword').value;
+  const errorBox = document.getElementById('adminLoginError');
+  errorBox.classList.remove('active');
+  const match = registeredAdmins.find(a => normalize(a.email) === normalize(email));
+  if(!match || match.password !== password){
+    errorBox.textContent = "Invalid Admin email or password.";
+    errorBox.classList.add('active');
+    return;
+  }
+  adminSession.isAuthenticated = true;
+  adminSession.user = match;
+  document.getElementById('adminLoginScreen').style.display = 'none';
+  showAdminPage('alumni');
+  renderAdminAll();
+  enforceAuthGuard();
+  history.pushState({ view: 'admin' }, '', '#admin');
+});
+document.getElementById('adminLogoutBtn').addEventListener('click', ()=>{
+  adminSession.isAuthenticated = false;
+  adminSession.user = null;
+  document.getElementById('adminLoginEmail').value = '';
+  document.getElementById('adminLoginPassword').value = '';
+  document.getElementById('adminRoot').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  showLoginFormView();
+  history.pushState({ view: 'login' }, '', '#login');
+});
+
+/* ---------- LOGIN FORM WIRING ---------- */
+document.getElementById('loginSubmitBtn').addEventListener('click', ()=>{
+  const identifier = document.getElementById('loginIdentifier').value;
+  const password = document.getElementById('loginPassword').value;
+  const errorBox = document.getElementById('loginError');
+  if(!identifier || !password){
+    errorBox.textContent = "Enter your email/phone and password.";
+    errorBox.classList.add('active');
+    return;
+  }
+  const result = attemptLogin(identifier, password);
+  if(!result.ok){
+    errorBox.textContent = result.error;
+    errorBox.classList.add('active');
+    return;
+  }
+  loginSuccess(result.user);
+});
+document.getElementById('loginPassword').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginSubmitBtn').click();
+});
+
+/* ---------- FORGOT PASSWORD WIRING ---------- */
+function showLoginFormView(){
+  document.getElementById('loginFormView').style.display = 'flex';
+  document.getElementById('loginFormView').style.flexDirection = 'column';
+  document.getElementById('forgotFormView').style.display = 'none';
+  document.getElementById('loginError').classList.remove('active');
+}
+function resetForgotSteps(){
+  ['forgotStepIdentifier','forgotStepOtp','forgotStepNewPassword','forgotStepAltContact','forgotStepAltSuccess'].forEach(id=>{
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('forgotError').classList.remove('active');
+  document.getElementById('forgotSuccess').classList.remove('active');
+}
+function showForgotFormView(){
+  document.getElementById('loginFormView').style.display = 'none';
+  document.getElementById('forgotFormView').style.display = 'flex';
+  document.getElementById('forgotFormView').style.flexDirection = 'column';
+  resetForgotSteps();
+  document.getElementById('forgotStepIdentifier').style.display = 'block';
+  document.getElementById('forgotIdentifier').value = '';
+  clearInterval(fpOtpTimerInterval); clearInterval(fpResendCooldownInterval);
+}
+document.getElementById('forgotPasswordLink').addEventListener('click', showForgotFormView);
+document.getElementById('backToLoginLink').addEventListener('click', showLoginFormView);
+
+let fpMatchedUser = null;
+let fpOtpCode = null;
+let fpOtpTimerInterval = null, fpOtpSecondsLeft = 0, fpResendCooldownInterval = null;
+
+document.getElementById('forgotContinueBtn').addEventListener('click', ()=>{
+  const identifier = document.getElementById('forgotIdentifier').value;
+  const errorBox = document.getElementById('forgotError');
+  errorBox.classList.remove('active');
+  if(!identifier){ errorBox.textContent = "Enter your registered email or phone number."; errorBox.classList.add('active'); return; }
+
+  const idNorm = normalize(identifier);
+  const match = registeredAlumni.find(u => normalize(u.email) === idNorm || normalize(u.phone) === idNorm);
+
+  if(match){
+    // CASE A — registered contact matched: OTP self-service reset, no Admin approval required.
+    fpMatchedUser = match;
+    resetForgotSteps();
+    document.getElementById('forgotStepOtp').style.display = 'block';
+    sendFpOtp();
+  } else {
+    // CASE B — no match: route to Admin-reviewed recovery with a new contact.
+    resetForgotSteps();
+    document.getElementById('forgotStepAltContact').style.display = 'block';
+    document.getElementById('forgotAltName').value = '';
+    document.getElementById('forgotAltContact').value = identifier;
+  }
+});
+
+function sendFpOtp(){
+  fpOtpCode = String(Math.floor(100000 + Math.random()*900000));
+  document.querySelectorAll('.fp-otp-box').forEach(b=> b.value='');
+  document.querySelector('.fp-otp-box').focus();
+  document.getElementById('forgotOtpMeta').textContent = `A 6-digit code was sent to ${maskEmail(fpMatchedUser.email)}.`;
+  fpOtpSecondsLeft = 120;
+  updateFpOtpTimerLabel();
+  clearInterval(fpOtpTimerInterval);
+  fpOtpTimerInterval = setInterval(()=>{
+    fpOtpSecondsLeft--; updateFpOtpTimerLabel();
+    if(fpOtpSecondsLeft <= 0){ clearInterval(fpOtpTimerInterval); fpOtpCode = null; document.getElementById('forgotOtpTimer').textContent = 'Code expired — request a new one.'; }
+  }, 1000);
+  startFpResendCooldown(30);
+  showToast(`Demo mode — OTP sent (${fpOtpCode}). A real deployment sends this via the existing OTP service.`);
+}
+function updateFpOtpTimerLabel(){
+  const m = String(Math.floor(fpOtpSecondsLeft/60)).padStart(2,'0');
+  const s = String(fpOtpSecondsLeft%60).padStart(2,'0');
+  document.getElementById('forgotOtpTimer').textContent = `Expires in ${m}:${s}`;
+}
+function startFpResendCooldown(seconds){
+  const wrap = document.getElementById('forgotResendWrap');
+  let left = seconds;
+  clearInterval(fpResendCooldownInterval);
+  function tick(){
+    if(left <= 0){
+      wrap.innerHTML = `Didn't get it? <a id="forgotResendLink">Resend code</a>`;
+      document.getElementById('forgotResendLink').addEventListener('click', sendFpOtp);
+      clearInterval(fpResendCooldownInterval);
+      return;
+    }
+    wrap.innerHTML = `Didn't get it? <span class="disabled">Resend in ${left}s</span>`;
+    left--;
+  }
+  tick();
+  fpResendCooldownInterval = setInterval(tick, 1000);
+}
+document.querySelectorAll('.fp-otp-box').forEach((box, idx, all)=>{
+  box.addEventListener('input', ()=>{ box.value = box.value.replace(/[^0-9]/g,'').slice(0,1); if(box.value && idx < all.length-1) all[idx+1].focus(); });
+  box.addEventListener('keydown', (e)=>{ if(e.key === 'Backspace' && !box.value && idx > 0) all[idx-1].focus(); });
+});
+document.getElementById('forgotOtpVerifyBtn').addEventListener('click', ()=>{
+  const entered = Array.from(document.querySelectorAll('.fp-otp-box')).map(b=>b.value).join('');
+  if(entered.length < 6){ showToast('Enter the full 6-digit code.'); return; }
+  if(!fpOtpCode){ showToast('This code has expired. Request a new one.'); return; }
+  if(entered !== fpOtpCode){ showToast('Incorrect code. Please try again.'); return; }
+  fpOtpCode = null;
+  clearInterval(fpOtpTimerInterval); clearInterval(fpResendCooldownInterval);
+  resetForgotSteps();
+  document.getElementById('forgotStepNewPassword').style.display = 'block';
+  document.getElementById('forgotNewPassword').value = '';
+  document.getElementById('forgotConfirmPassword').value = '';
+});
+
+document.getElementById('forgotSetPasswordBtn').addEventListener('click', ()=>{
+  const pw = document.getElementById('forgotNewPassword').value;
+  const cpw = document.getElementById('forgotConfirmPassword').value;
+  const errorBox = document.getElementById('forgotPwError');
+  errorBox.classList.remove('active');
+  if(!pw || pw.length < 6){ errorBox.textContent = "Password must be at least 6 characters."; errorBox.classList.add('active'); return; }
+  if(pw !== cpw){ errorBox.textContent = "Passwords do not match."; errorBox.classList.add('active'); return; }
+  // Production: AuthService.resetPassword(fpMatchedUser.id, newHashedPassword)
+  fpMatchedUser.password = pw;
+  showToast('Password updated successfully. Please log in.');
+  fpMatchedUser = null;
+  showLoginFormView();
+});
+
+document.getElementById('forgotAltTryAgainBtn').addEventListener('click', showForgotFormView);
+document.getElementById('forgotAltSubmitBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('forgotAltName').value;
+  const contact = document.getElementById('forgotAltContact').value;
+  const errorBox = document.getElementById('forgotAltError');
+  errorBox.classList.remove('active');
+  if(!name || !contact){ errorBox.textContent = "Enter your name and a new email or phone number."; errorBox.classList.add('active'); return; }
+  // Production: AuthService.requestAccountRecovery(...) -> existing Admin approval queue.
+  passwordResetRequests.push({
+    id: 'PR' + Date.now(), name, newContact: contact,
+    requestedAt: new Date().toISOString(), status: 'pending'
+  });
+  resetForgotSteps();
+  document.getElementById('forgotStepAltSuccess').style.display = 'block';
+});
+document.getElementById('forgotAltDoneBtn').addEventListener('click', showLoginFormView);
+
+/* ---------- AVATAR RENDERING ---------- */
+function avatarMarkup(){
+  if(!currentAlumni) return '';
+  if(currentAlumni.photo) return `<img src="${currentAlumni.photo}" alt="${currentAlumni.fullName}">`;
+  return initials(currentAlumni.fullName);
+}
+function refreshAvatarsEverywhere(){
+  document.getElementById('topbarAvatar').innerHTML = avatarMarkup();
+  const profileAvatar = document.getElementById('profileAvatar');
+  profileAvatar.innerHTML = avatarMarkup() + '<div class="profile-avatar-edit">CHANGE</div>';
+}
+
+function renderHeader(){
+  if(!currentAlumni) return;
+  document.getElementById('topbarName').textContent = currentAlumni.fullName;
+  document.getElementById('topbarId').textContent = currentAlumni.id;
+  document.getElementById('bannerName').textContent = currentAlumni.fullName;
+  document.getElementById('bannerQuote').textContent = `"${dashboardContent.headline}"`;
+  document.getElementById('profileName').textContent = currentAlumni.fullName;
+  document.getElementById('profileRole').textContent = `Alumni · Batch of ${currentAlumni.graduationYear}`;
+  refreshAvatarsEverywhere();
+}
+
+function renderStats(){
+  const forms = alumniForms();
+  const pending = forms.filter(f=>!f.submitted).length;
+  const submitted = forms.filter(f=>f.submitted).length;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statSubmitted').textContent = submitted;
+  document.getElementById('statAnnouncements').textContent = announcements.length;
+
+  const total = forms.length;
+  const pct = total ? Math.round((submitted/total)*1000)/10 : 0;
+  document.getElementById('donutPct').textContent = pct + '%';
+  const circumference = 2 * Math.PI * 82;
+  const ring = document.getElementById('donutRing');
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference - (pct/100)*circumference;
+}
+
+function buildFeedbackItem(f){
+  const item = el(`
+    <div class="feedback-item">
+      <div class="fb-icon">📋</div>
+      <div class="fb-body">
+        <span class="fb-badge">${f.submitted ? 'Submitted' : 'New Feedback'}</span>
+        <span class="fb-title">${f.title}</span>
+      </div>
+      <div class="fb-right">
+        <div class="fb-due">Due: ${formatDate(f.dueDate)}</div>
+        ${f.submitted ? `<span class="status-pill status-submitted">Completed</span>` : `<button class="btn btn-primary give-fb-btn">Give Feedback</button>`}
+      </div>
+    </div>
+  `);
+  if(!f.submitted) item.addEventListener('click', ()=> openFeedbackModal(f.id));
+  return item;
+}
+
+function renderPriorityFeedback(){
+  const container = document.getElementById('priorityFeedbackList');
+  container.innerHTML = '';
+  const pending = alumniForms().filter(f=>!f.submitted).slice(0,3);
+  if(pending.length === 0){ container.appendChild(el(`<div class="empty-state"><div class="ic">✅</div>No pending feedback. You are all caught up!</div>`)); return; }
+  pending.forEach(f=> container.appendChild(buildFeedbackItem(f)));
+}
+function renderAvailableFeedback(){
+  const container = document.getElementById('availableFeedbackList');
+  container.innerHTML = '';
+  const pending = alumniForms().filter(f=>!f.submitted);
+  if(pending.length === 0){ container.appendChild(el(`<div class="empty-state"><div class="ic">✅</div>No pending feedback. You are all caught up!</div>`)); return; }
+  pending.forEach(f=> container.appendChild(buildFeedbackItem(f)));
+}
+function renderSubmissions(){
+  const tbody = document.getElementById('submissionsTable');
+  tbody.innerHTML = '';
+  const submitted = alumniForms().filter(f=>f.submitted).sort((a,b)=> new Date(b.submittedOn) - new Date(a.submittedOn));
+  if(submitted.length === 0){ tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-faint); padding:30px;">No feedback submissions yet.</td></tr>`; return; }
+  submitted.forEach(f=>{
+    tbody.appendChild(el(`<tr><td>${f.title}</td><td>${formatDate(f.submittedOn)}</td><td><span class="status-pill status-submitted">Submitted</span></td></tr>`));
+  });
+}
+function renderAnnouncements(){
+  const container = document.getElementById('announcementsList');
+  container.innerHTML = '';
+  if(announcements.length === 0){ container.appendChild(el(`<div class="empty-state"><div class="ic">📣</div>No announcements right now.</div>`)); return; }
+  announcements.forEach(a=>{
+    container.appendChild(el(`
+      <div class="list-card">
+        <div class="fb-icon">📣</div>
+        <div style="flex:1;"><div style="font-weight:700; font-size:14px; margin-bottom:3px;">${a.title}</div><div style="font-size:12.5px; color:var(--text-faint);">${a.body}</div></div>
+        <div style="font-size:11.5px; color:var(--text-faint); flex-shrink:0;">${a.date}</div>
+      </div>
+    `));
+  });
+}
+function renderProfile(){
+  if(!currentAlumni) return;
+  const grid = document.getElementById('profileGrid');
+  const fields = [
+    ['Full Name', currentAlumni.fullName], ['Email', currentAlumni.email], ['Phone Number', currentAlumni.phone],
+    ['Graduation Year', currentAlumni.graduationYear], ['Department', currentAlumni.department], ['Degree / Program', currentAlumni.degree],
+    ['Batch', currentAlumni.batch], ['Current Organization', currentAlumni.organization], ['Current Designation', currentAlumni.designation],
+  ];
+  grid.innerHTML = fields.map(([label,value])=>`<div class="profile-field"><div class="profile-field-label">${label.toUpperCase()}</div><div class="profile-field-value">${value}</div></div>`).join('');
+}
+
+/* ---------- NOTIFICATIONS ---------- */
+function renderNotifications(){
+  const unread = notifications.filter(n=>!n.read).length;
+  const badge = document.getElementById('notifBadge');
+  if(unread > 0){ badge.style.display='flex'; badge.textContent = unread; } else { badge.style.display='none'; }
+  const list = document.getElementById('notifList');
+  list.innerHTML = '';
+  if(notifications.length === 0){ list.appendChild(el(`<div class="empty-state" style="padding:24px;">No notifications yet.</div>`)); return; }
+  notifications.slice().reverse().forEach(n=>{
+    const item = el(`<div class="notif-item ${n.read ? 'read':'unread'}"><div class="notif-dot"></div><div><div class="notif-title">${n.icon} ${n.title}</div><div class="notif-time">${n.time}</div></div></div>`);
+    item.addEventListener('click', ()=>{ n.read = true; renderNotifications(); toggleNotifPanel(false); showPage(n.page); });
+    list.appendChild(item);
+  });
+}
+function addNotification(icon, title, page){
+  notifications.push({ id: 'n'+Date.now(), icon, title, time:'just now', read:false, page });
+  renderNotifications();
+}
+function toggleNotifPanel(force){
+  const panel = document.getElementById('notifPanel');
+  const show = force !== undefined ? force : !panel.classList.contains('active');
+  panel.classList.toggle('active', show);
+}
+document.getElementById('notifBtn').addEventListener('click', (e)=>{ e.stopPropagation(); toggleNotifPanel(); });
+document.getElementById('notifMarkAll').addEventListener('click', (e)=>{ e.stopPropagation(); notifications.forEach(n=>n.read = true); renderNotifications(); });
+document.addEventListener('click', (e)=>{ const wrap = document.getElementById('notifWrap'); if(wrap && !wrap.contains(e.target)) toggleNotifPanel(false); });
+
+/* ---------- THREE-LINE MENU: COLLAPSE (desktop) / DRAWER (mobile) ---------- */
+function isMobileWidth(){ return window.innerWidth <= 880; }
+document.getElementById('hamburgerBtn').addEventListener('click', ()=>{
+  const root = document.getElementById('appRoot');
+  if(isMobileWidth()){
+    root.classList.toggle('mobile-drawer-open');
+    document.getElementById('sidebarBackdrop').classList.toggle('active', root.classList.contains('mobile-drawer-open'));
+  } else {
+    root.classList.toggle('sidebar-collapsed');
+  }
+});
+document.getElementById('sidebarBackdrop').addEventListener('click', ()=>{
+  document.getElementById('appRoot').classList.remove('mobile-drawer-open');
+  document.getElementById('sidebarBackdrop').classList.remove('active');
+});
+window.addEventListener('resize', ()=>{
+  const root = document.getElementById('appRoot');
+  if(!isMobileWidth()){ root.classList.remove('mobile-drawer-open'); document.getElementById('sidebarBackdrop').classList.remove('active'); }
+});
+
+/* ---------- CLICKABLE STAT CARDS / PROFILE ---------- */
+document.getElementById('cardPending').addEventListener('click', ()=> showPage('available'));
+document.getElementById('cardSubmitted').addEventListener('click', ()=> showPage('submissions'));
+document.getElementById('cardAnnouncements').addEventListener('click', ()=> showPage('announcements'));
+document.getElementById('userBlock').addEventListener('click', ()=> showPage('profile'));
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+/* ---------- FEEDBACK MODAL (dynamic, admin-defined questions) ---------- */
+let activeFormId = null;
+let activeAnswers = {};
+
+function openFeedbackModal(formId){
+  const form = feedbackForms.find(f=>f.id===formId);
+  if(!form || form.submitted) return;
+  activeFormId = formId;
+  activeAnswers = {};
+  document.getElementById('modalTitle').textContent = form.title;
+  document.getElementById('modalSub').textContent = 'Due: ' + formatDate(form.dueDate);
+  const qContainer = document.getElementById('modalQuestions');
+  qContainer.innerHTML = '';
+  form.questions.forEach(q=> qContainer.appendChild(buildQuestionBlock(q)));
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function buildQuestionBlock(q){
+  const wrap = document.createElement('div');
+  wrap.className = 'q-block';
+  const label = document.createElement('div');
+  label.className = 'q-label';
+  label.innerHTML = q.label + '<span class="q-required">*</span>';
+  wrap.appendChild(label);
+  if(q.type === 'rating'){
+    const row = document.createElement('div'); row.className = 'rating-row';
+    [1,2,3,4,5].forEach(n=>{
+      const opt = document.createElement('div'); opt.className = 'rating-opt'; opt.textContent = n;
+      opt.addEventListener('click', ()=>{ row.querySelectorAll('.rating-opt').forEach(o=>o.classList.remove('selected')); opt.classList.add('selected'); activeAnswers[q.id] = n; });
+      row.appendChild(opt);
+    });
+    wrap.appendChild(row);
+  } else if(q.type === 'select'){
+    const sel = document.createElement('select');
+    sel.innerHTML = `<option value="">Select an option</option>` + q.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    sel.addEventListener('change', e=>{ activeAnswers[q.id] = e.target.value; });
+    wrap.appendChild(sel);
+  } else {
+    const ta = document.createElement('textarea'); ta.placeholder = 'Type your answer here...';
+    ta.addEventListener('input', e=>{ activeAnswers[q.id] = e.target.value; });
+    wrap.appendChild(ta);
+  }
+  return wrap;
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); activeFormId = null; }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{ if(e.target.id === 'modalOverlay') closeModal(); });
+
+document.getElementById('modalSubmit').addEventListener('click', ()=>{
+  if(!activeFormId) return;
+  document.getElementById('confirmSubmitOverlay').classList.add('active');
+});
+function closeConfirmSubmit(){ document.getElementById('confirmSubmitOverlay').classList.remove('active'); }
+document.getElementById('confirmSubmitClose').addEventListener('click', closeConfirmSubmit);
+document.getElementById('confirmSubmitCancel').addEventListener('click', closeConfirmSubmit);
+document.getElementById('confirmSubmitYes').addEventListener('click', ()=>{
+  const form = feedbackForms.find(f=>f.id===activeFormId);
+  if(!form){ closeConfirmSubmit(); return; }
+  // Production: FeedbackService.submitResponse(form.id, activeAnswers) — server prevents duplicate submissions.
+  form.submitted = true;
+  form.submittedOn = new Date().toISOString();
+  closeConfirmSubmit();
+  closeModal();
+  renderAll();
+  addNotification('✅', `Feedback submitted: ${form.title}`, 'submissions');
+  showSuccessScreen(form.title);
+});
+
+/* ---------- SUCCESS SCREEN ---------- */
+function showSuccessScreen(formTitle){
+  document.getElementById('successFormName').textContent = `Submitted: ${formTitle}`;
+  showPage('success');
+  launchConfetti();
+}
+function launchConfetti(){
+  const panel = document.getElementById('successScreenPanel');
+  panel.querySelectorAll('.confetti-piece').forEach(p=>p.remove());
+  const colors = [getComputedStyle(document.documentElement).getPropertyValue('--accent-1'), '#17c187', '#f5a524', '#5b6bea', '#fb7185'];
+  for(let i=0;i<26;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (5 + Math.random()*90) + '%';
+    piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDuration = (1.4 + Math.random()*1.2) + 's';
+    piece.style.animationDelay = (Math.random()*0.4) + 's';
+    panel.appendChild(piece);
+    setTimeout(()=> piece.remove(), 3200);
+  }
+}
+document.getElementById('successBackDashboard').addEventListener('click', ()=> showPage('dashboard'));
+document.getElementById('successViewSubmissions').addEventListener('click', ()=> showPage('submissions'));
+
+/* ---------- PROGRESS BREAKDOWN MODAL ---------- */
+document.getElementById('progressWrap').addEventListener('click', ()=>{
+  const forms = alumniForms();
+  const container = document.getElementById('progressBreakdown');
+  container.innerHTML = '';
+  if(forms.length === 0){ container.appendChild(el(`<div class="empty-state">No feedback forms assigned yet.</div>`)); }
+  else {
+    forms.forEach(f=>{
+      container.appendChild(el(`
+        <div class="list-card" style="padding:12px 14px; margin-bottom:8px;">
+          <div style="flex:1; font-size:13px; font-weight:600;">${f.title}</div>
+          <span class="status-pill ${f.submitted ? 'status-submitted' : 'status-pending'}">${f.submitted ? 'Submitted' : 'Pending'}</span>
+        </div>
+      `));
+    });
+  }
+  document.getElementById('progressModalOverlay').classList.add('active');
+});
+document.getElementById('progressModalClose').addEventListener('click', ()=> document.getElementById('progressModalOverlay').classList.remove('active'));
+document.getElementById('progressModalDone').addEventListener('click', ()=> document.getElementById('progressModalOverlay').classList.remove('active'));
+document.getElementById('progressModalOverlay').addEventListener('click', (e)=>{ if(e.target.id==='progressModalOverlay') e.currentTarget.classList.remove('active'); });
+
+/* ---------- PROFILE PHOTO CHANGE + OTP ---------- */
+let pendingPhotoDataUrl = null;
+let otpCode = null;
+let otpTimerInterval = null;
+let otpSecondsLeft = 0;
+let resendCooldownInterval = null;
+
+document.getElementById('profileAvatar').addEventListener('click', ()=>{
+  pendingPhotoDataUrl = null;
+  document.getElementById('photoPreview').innerHTML = '📷';
+  document.getElementById('photoFileInput').value = '';
+  document.getElementById('photoModalNext').disabled = true;
+  document.getElementById('photoModalOverlay').classList.add('active');
+});
+document.getElementById('photoModalClose').addEventListener('click', ()=> document.getElementById('photoModalOverlay').classList.remove('active'));
+document.getElementById('photoModalCancel').addEventListener('click', ()=> document.getElementById('photoModalOverlay').classList.remove('active'));
+document.getElementById('photoFileInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{ pendingPhotoDataUrl = ev.target.result; document.getElementById('photoPreview').innerHTML = `<img src="${pendingPhotoDataUrl}">`; document.getElementById('photoModalNext').disabled = false; };
+  reader.readAsDataURL(file);
+});
+document.getElementById('photoModalNext').addEventListener('click', ()=>{
+  if(!pendingPhotoDataUrl) return;
+  document.getElementById('photoModalOverlay').classList.remove('active');
+  sendOtp();
+  document.getElementById('otpModalOverlay').classList.add('active');
+});
+function sendOtp(){
+  otpCode = String(Math.floor(100000 + Math.random()*900000));
+  const boxes = document.querySelectorAll('.otp-box');
+  boxes.forEach(b=> b.value='');
+  boxes[0].focus();
+  document.getElementById('otpMeta').textContent = `A 6-digit code was sent to ${maskEmail(currentAlumni.email)}.`;
+  startOtpTimer(120);
+  startResendCooldown(30);
+  showToast(`Demo mode — OTP sent (${otpCode}). A real deployment sends this via the existing email/SMS OTP service.`);
+}
+function maskEmail(email){ const [user, domain] = email.split('@'); return user.slice(0,2) + '***@' + domain; }
+function startOtpTimer(seconds){
+  otpSecondsLeft = seconds;
+  updateOtpTimerLabel();
+  clearInterval(otpTimerInterval);
+  otpTimerInterval = setInterval(()=>{
+    otpSecondsLeft--;
+    updateOtpTimerLabel();
+    if(otpSecondsLeft <= 0){ clearInterval(otpTimerInterval); otpCode = null; document.getElementById('otpTimer').textContent = 'Code expired — request a new one.'; }
+  }, 1000);
+}
+function updateOtpTimerLabel(){
+  const m = String(Math.floor(otpSecondsLeft/60)).padStart(2,'0');
+  const s = String(otpSecondsLeft%60).padStart(2,'0');
+  document.getElementById('otpTimer').textContent = `Expires in ${m}:${s}`;
+}
+function startResendCooldown(seconds){
+  const wrap = document.getElementById('otpResendWrap');
+  let left = seconds;
+  clearInterval(resendCooldownInterval);
+  function tick(){
+    if(left <= 0){
+      wrap.innerHTML = `Didn't get it? <a id="otpResendLink">Resend code</a>`;
+      document.getElementById('otpResendLink').addEventListener('click', ()=>{ sendOtp(); });
+      clearInterval(resendCooldownInterval);
+      return;
+    }
+    wrap.innerHTML = `Didn't get it? <span class="disabled">Resend in ${left}s</span>`;
+    left--;
+  }
+  tick();
+  resendCooldownInterval = setInterval(tick, 1000);
+}
+document.querySelectorAll('.otp-box').forEach((box, idx, all)=>{
+  box.addEventListener('input', ()=>{ box.value = box.value.replace(/[^0-9]/g,'').slice(0,1); if(box.value && idx < all.length-1) all[idx+1].focus(); });
+  box.addEventListener('keydown', (e)=>{ if(e.key === 'Backspace' && !box.value && idx > 0) all[idx-1].focus(); });
+});
+function closeOtpModal(){ document.getElementById('otpModalOverlay').classList.remove('active'); clearInterval(otpTimerInterval); clearInterval(resendCooldownInterval); }
+document.getElementById('otpModalClose').addEventListener('click', closeOtpModal);
+document.getElementById('otpCancel').addEventListener('click', closeOtpModal);
+document.getElementById('otpVerify').addEventListener('click', ()=>{
+  const entered = Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join('');
+  if(entered.length < 6){ showToast('Enter the full 6-digit code.'); return; }
+  if(!otpCode){ showToast('This code has expired. Request a new one.'); return; }
+  if(entered !== otpCode){ showToast('Incorrect code. Please try again.'); return; }
+  currentAlumni.photo = pendingPhotoDataUrl;
+  otpCode = null;
+  refreshAvatarsEverywhere();
+  closeOtpModal();
+  showToast('Profile photo updated successfully.');
+});
+
+/* ---------- SETTINGS: THEME + PALETTE ---------- */
+function applyTheme(theme){
+  appSettings.theme = theme;
+  let resolved = theme;
+  if(theme === 'system') resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', resolved);
+  document.querySelectorAll('.theme-opt').forEach(o=> o.classList.toggle('active', o.getAttribute('data-theme-opt') === theme));
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{ if(appSettings.theme === 'system') applyTheme('system'); });
+document.querySelectorAll('.theme-opt').forEach(opt=> opt.addEventListener('click', ()=> applyTheme(opt.getAttribute('data-theme-opt'))));
+
+function applyPalette(key){
+  appSettings.palette = key;
+  const p = palettes[key];
+  document.documentElement.style.setProperty('--accent-1', p.a1);
+  document.documentElement.style.setProperty('--accent-2', p.a2);
+  document.querySelectorAll('.palette-swatch').forEach(s=> s.classList.toggle('active', s.getAttribute('data-palette') === key));
+}
+function buildPaletteSwatches(){
+  const row = document.getElementById('paletteRow');
+  row.innerHTML = '';
+  Object.entries(palettes).forEach(([key, p])=>{
+    const wrap = document.createElement('div'); wrap.className = 'palette-item';
+    const sw = document.createElement('div'); sw.className = 'palette-swatch'; sw.setAttribute('data-palette', key);
+    sw.style.background = `linear-gradient(120deg, ${p.a1}, ${p.a2})`;
+    sw.innerHTML = '<span class="check">✓</span>';
+    sw.addEventListener('click', ()=> applyPalette(key));
+    wrap.appendChild(sw);
+    const lbl = document.createElement('div'); lbl.className = 'palette-label'; lbl.textContent = p.name;
+    wrap.appendChild(lbl);
+    row.appendChild(wrap);
+  });
+}
+
+/* ---------- TOAST ---------- */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('active');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(()=>t.classList.remove('active'), 3200);
+}
+
+/* ---------- NAVIGATION (guarded — protected pages require session.isAuthenticated) ---------- */
+function showPage(name){
+  if(!session.isAuthenticated){ enforceAuthGuard(); return; }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navItem = document.querySelector(`.nav-item[data-page="${name}"]`);
+  if(navItem) navItem.classList.add('active');
+  history.replaceState({ view: 'app', page: name }, '', '#' + name);
+}
+document.querySelectorAll('.nav-item[data-page]').forEach(item=> item.addEventListener('click', ()=> showPage(item.getAttribute('data-page'))));
+document.querySelectorAll('[data-page-link]').forEach(item=> item.addEventListener('click', ()=> showPage(item.getAttribute('data-page-link'))));
+
+/* ---------- ADMIN PANEL ---------- */
+function showAdminPage(name){
+  document.querySelectorAll('.admin-panel-view').forEach(p=>p.classList.remove('active'));
+  document.getElementById('admin-page-'+name).classList.add('active');
+  document.querySelectorAll('#adminRoot .nav-item').forEach(n=>n.classList.remove('active'));
+  const navItem = document.querySelector(`#adminRoot .nav-item[data-admin-page="${name}"]`);
+  if(navItem) navItem.classList.add('active');
+}
+document.querySelectorAll('#adminRoot .nav-item[data-admin-page]').forEach(item=>
+  item.addEventListener('click', ()=> showAdminPage(item.getAttribute('data-admin-page'))));
+
+function maskPhone(phone){ return phone.slice(0, -4).replace(/[0-9]/g,'•') + phone.slice(-4); }
+
+function renderAdminAlumni(){
+  const tbody = document.getElementById('adminAlumniTable');
+  tbody.innerHTML = registeredAlumni.map(a=>`
+    <tr><td>${a.fullName}</td><td>${a.email}</td><td>${a.phone}</td><td>${a.batch}</td><td>${a.department}</td></tr>
+  `).join('');
+}
+
+function renderAdminRecovery(){
+  const container = document.getElementById('adminRecoveryList');
+  container.innerHTML = '';
+  if(passwordResetRequests.length === 0){ container.appendChild(el(`<div class="empty-state"><div class="ic">🔑</div>No recovery requests.</div>`)); return; }
+  passwordResetRequests.slice().reverse().forEach(req=>{
+    const statusPill = req.status === 'approved' ? '<span class="status-pill status-submitted">Approved</span>'
+      : req.status === 'rejected' ? '<span class="status-pill" style="background:var(--red-bg); color:var(--red);">Rejected</span>'
+      : '<span class="status-pill status-pending">Pending</span>';
+    const row = el(`
+      <div class="list-card" style="align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:13.5px; margin-bottom:4px;">${req.name}</div>
+          <div style="font-size:12px; color:var(--text-faint); margin-bottom:2px;">Requested new contact: <span class="mono-mask">${req.newContact}</span></div>
+          <div style="font-size:11px; color:var(--text-faint);">Submitted ${new Date(req.requestedAt).toLocaleString()}</div>
+        </div>
+        <div style="text-align:right; flex-shrink:0;">
+          ${statusPill}
+          ${req.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;"><button class="btn btn-primary req-approve" style="padding:6px 12px;">Approve</button><button class="btn btn-ghost req-reject" style="padding:6px 12px;">Reject</button></div>` : ''}
+        </div>
+      </div>
+    `);
+    if(req.status === 'pending'){
+      row.querySelector('.req-approve').addEventListener('click', ()=>{
+        req.status = 'approved';
+        // Production: AuthService.approveRecovery(req.id) -> sends secure reset link/OTP to req.newContact.
+        showToast(`Recovery request approved for ${req.name}.`);
+        renderAdminRecovery();
+      });
+      row.querySelector('.req-reject').addEventListener('click', ()=>{
+        req.status = 'rejected';
+        showToast(`Recovery request rejected for ${req.name}.`);
+        renderAdminRecovery();
+      });
+    }
+    container.appendChild(row);
+  });
+}
+
+function renderAdminForms(){
+  const container = document.getElementById('adminFormsList');
+  container.innerHTML = '';
+  const forms = alumniForms();
+  if(forms.length === 0){ container.appendChild(el(`<div class="empty-state">No feedback forms yet.</div>`)); return; }
+  forms.slice().reverse().forEach(f=>{
+    const submittedCount = f.submitted ? 1 : 0;
+    container.appendChild(el(`
+      <div class="list-card">
+        <div class="fb-icon">📋</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:14px; margin-bottom:3px;">${f.title}</div>
+          <div style="font-size:11.5px; color:var(--text-faint);">Due ${formatDate(f.dueDate)} · ${f.questions.length} question(s) · Audience: Alumni</div>
+        </div>
+        <span class="status-pill ${f.submitted ? 'status-submitted' : 'status-pending'}">${submittedCount} response(s)</span>
+      </div>
+    `));
+  });
+}
+
+function renderAdminAll(){ renderAdminAlumni(); renderAdminRecovery(); renderAdminForms(); }
+
+/* ---------- ADMIN: CREATE FEEDBACK FORM ---------- */
+let adminQuestionRows = [];
+function openAdminFormModal(){
+  document.getElementById('adminFormTitle').value = '';
+  document.getElementById('adminFormDueDate').value = '';
+  adminQuestionRows = [{ type: 'text', label: '' }];
+  renderAdminQuestionBuilder();
+  document.getElementById('adminFormModalOverlay').classList.add('active');
+}
+function renderAdminQuestionBuilder(){
+  const wrap = document.getElementById('adminQuestionsBuilder');
+  wrap.innerHTML = '';
+  adminQuestionRows.forEach((q, i)=>{
+    const row = el(`
+      <div class="qb-row">
+        <input type="text" placeholder="Question text" value="${q.label.replace(/"/g,'&quot;')}" data-qi="${i}" class="qb-label">
+        <select data-qi="${i}" class="qb-type">
+          <option value="text" ${q.type==='text'?'selected':''}>Text</option>
+          <option value="rating" ${q.type==='rating'?'selected':''}>Rating (1-5)</option>
+          <option value="select" ${q.type==='select'?'selected':''}>Multiple Choice</option>
+        </select>
+        <span class="qb-remove" data-qi="${i}">✕</span>
+      </div>
+    `);
+    row.querySelector('.qb-label').addEventListener('input', e=>{ adminQuestionRows[i].label = e.target.value; });
+    row.querySelector('.qb-type').addEventListener('change', e=>{ adminQuestionRows[i].type = e.target.value; });
+    row.querySelector('.qb-remove').addEventListener('click', ()=>{ adminQuestionRows.splice(i,1); renderAdminQuestionBuilder(); });
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('adminCreateFormBtn').addEventListener('click', openAdminFormModal);
+document.getElementById('adminAddQuestionBtn').addEventListener('click', ()=>{ adminQuestionRows.push({ type:'text', label:'' }); renderAdminQuestionBuilder(); });
+document.getElementById('adminFormModalClose').addEventListener('click', ()=> document.getElementById('adminFormModalOverlay').classList.remove('active'));
+document.getElementById('adminFormModalCancel').addEventListener('click', ()=> document.getElementById('adminFormModalOverlay').classList.remove('active'));
+document.getElementById('adminFormReleaseBtn').addEventListener('click', ()=>{
+  const title = document.getElementById('adminFormTitle').value.trim();
+  const dueDate = document.getElementById('adminFormDueDate').value.trim();
+  const validQuestions = adminQuestionRows.filter(q=>q.label.trim());
+  if(!title || !dueDate || validQuestions.length === 0){
+    showToast('Add a title, due date, and at least one question.');
+    return;
+  }
+  // Production: FeedbackService.createForm({...}) -> released immediately to audience "alumni".
+  const newForm = {
+    id: 'FB-' + Math.floor(100 + Math.random()*900),
+    title, dueDate, audience: 'alumni', submitted: false,
+    questions: validQuestions.map((q,i)=>({ id:'q'+(i+1), type:q.type, label:q.label, options: q.type==='select' ? ['Yes','No','Maybe'] : undefined }))
+  };
+  feedbackForms.push(newForm);
+  document.getElementById('adminFormModalOverlay').classList.remove('active');
+  renderAdminForms();
+  showToast(`"${title}" released to Alumni.`);
+  if(session.isAuthenticated){ addNotification('📋', `New feedback form released: ${title}`, 'available'); renderAll(); }
+});
+
+/* ---------- INIT ---------- */
+function renderAll(){
+  renderHeader();
+  renderStats();
+  renderPriorityFeedback();
+  renderAvailableFeedback();
+  renderSubmissions();
+  renderAnnouncements();
+  renderProfile();
+  renderNotifications();
+}
+
+buildPaletteSwatches();
+applyTheme(appSettings.theme);
+applyPalette(appSettings.palette);
+buildCarousel();
+restartCarouselTimer();
+document.getElementById('demoCredsNote').innerHTML =
+  'Demo credentials — any of the 5 registered test accounts, all using password <strong>Alumni@123</strong>:<br>' +
+  registeredAlumni.map(a => `${a.fullName}: <strong>${a.email}</strong> / <strong>${a.phone}</strong>`).join('<br>') +
+  '<br>In production this form authenticates against the college\'s existing user directory and role system.';
+history.replaceState({ view: 'login' }, '', '#login');
+enforceAuthGuard(); // starts on the Login page — no protected content until authenticated
+</script>
+</body>
+</html>

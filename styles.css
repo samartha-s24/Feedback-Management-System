@@ -1,0 +1,38 @@
+
+:root {
+    --primary: #1aa7d8;
+    --background: #0b1418;
+    --card: #182326;
+    --sidebar: #121c20;
+    --text: #ffffff;
+}
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: Inter, sans-serif;
+}
+.sidebar {
+    background: var(--sidebar-color);
+}
+.header {
+    background: var(--sidebar-color);
+}
+.welcome-card {
+    background: linear-gradient(90deg, #1da9d8 0%, #2bc7e8 100%);
+    color: white;
+}
+button {
+    background: #1da9d8;
+    color: white;
+    border: none;
+}
+
+button:hover {
+    background: #168ab0;
+}
+.sidebar .active {
+    background: #1da9d8;
+    color: white;
+    border-radius: 10px;
+}
+

@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFMS — Parent Portal</title>
+<style>
+/* =========================================================
+   AFMS — Parent Portal
+   Design language cloned from the AFMS Student Dashboard:
+   dark navy surfaces, cyan/teal accent, rounded cards.
+   ========================================================= */
+
+:root {
+  /* Core surfaces */
+  --bg-app: #0b1017;
+  --bg-sidebar: #0e141c;
+  --bg-topbar: #0e141c;
+  --bg-card: #131b25;
+  --bg-card-alt: #10161f;
+  --border-subtle: #1f2a37;
+
+  /* Text */
+  --text-primary: #f3f6f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Accent (teal -> blue) */
+  --accent-teal: #17b8c9;
+  --accent-blue: #2f7de1;
+  --accent-gradient: linear-gradient(120deg, #16b8cf 0%, #1c8fe0 60%, #2f6fe0 100%);
+
+  /* Status colors */
+  --amber: #f59e0b;
+  --amber-bg: rgba(245, 158, 11, 0.14);
+  --green: #22c55e;
+  --green-bg: rgba(34, 197, 94, 0.14);
+  --indigo: #6366f1;
+  --indigo-bg: rgba(99, 102, 241, 0.14);
+  --teal-bg: rgba(23, 184, 201, 0.14);
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+
+  --sidebar-width: 264px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ===================== LAYOUT ===================== */
+
+.main-wrapper {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.25s ease;
+}
+
+body.sidebar-collapsed .main-wrapper {
+  margin-left: 0;
+}
+
+/* ===================== SIDEBAR ===================== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 22px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--accent-gradient);
+  font-size: 18px;
+}
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-title { font-weight: 700; font-size: 15px; }
+.brand-subtitle { font-size: 11px; color: var(--text-muted); }
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 16px 12px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-item:hover { background: #161f2a; color: var(--text-primary); }
+
+.nav-item.active {
+  background: var(--accent-gradient);
+  color: #051217;
+  font-weight: 600;
+}
+
+.nav-icon { width: 18px; text-align: center; font-size: 14px; }
+
+.nav-item.logout {
+  color: #f87171;
+  margin-top: 10px;
+}
+.nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+
+/* ===================== TOPBAR ===================== */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--bg-topbar);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.topbar-title { display: flex; flex-direction: column; line-height: 1.25; }
+.topbar-title-main { font-weight: 700; font-size: 14.5px; }
+.topbar-title-sub { font-size: 10.5px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.icon-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.icon-btn:hover { background: #1a2431; color: var(--text-primary); }
+
+.notif-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+  border: 2px solid var(--bg-topbar);
+}
+
+.profile-menu { position: relative; }
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+}
+.profile-trigger:hover { background: var(--bg-card); }
+
+.profile-text { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+.profile-name { font-size: 13px; font-weight: 600; }
+.profile-id { font-size: 10.5px; color: var(--text-muted); }
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #051217;
+}
+
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.35);
+}
+.profile-dropdown.open { display: flex; }
+.profile-dropdown a {
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.profile-dropdown a:hover { background: #1a2431; color: var(--text-primary); }
+
+/* ===================== CONTENT ===================== */
+
+.content {
+  padding: 24px 28px 8px;
+  flex: 1;
+}
+
+/* Banner */
+.banner {
+  background: var(--accent-gradient);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #ffffff;
+  margin-bottom: 22px;
+}
+
+.banner-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.banner-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.banner-title { margin: 4px 0 6px; font-size: 27px; font-weight: 800; }
+.banner-sub { margin: 0; font-size: 14px; opacity: 0.92; max-width: 640px; }
+
+/* Stat cards */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.icon-amber { background: var(--amber-bg); color: var(--amber); }
+.icon-green { background: var(--green-bg); color: var(--green); }
+.icon-indigo { background: var(--indigo-bg); color: var(--indigo); }
+.icon-teal { background: var(--teal-bg); color: var(--accent-teal); }
+
+.stat-card.clickable { cursor: pointer; }
+.stat-card.clickable:hover { border-color: #2a3a4a; }
+
+.stat-body { display: flex; flex-direction: column; gap: 2px; }
+.stat-label { font-size: 12.5px; color: var(--text-secondary); }
+.stat-value { font-size: 24px; font-weight: 800; }
+
+/* Bottom grid */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 18px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panel h2 { margin: 0 0 14px; font-size: 15.5px; font-weight: 700; }
+.panel-header h2 { margin: 0; }
+
+.view-all-btn {
+  background: var(--teal-bg);
+  color: var(--accent-teal);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+.view-all-btn:hover { background: rgba(23, 184, 201, 0.24); }
+
+/* Feedback list */
+.feedback-list { display: flex; flex-direction: column; gap: 12px; }
+
+.feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.feedback-row:hover { transform: translateY(-1px); border-color: #2a3a4a; }
+
+.feedback-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-bg);
+  color: var(--accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.feedback-main { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+
+.feedback-badge {
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.feedback-title { font-size: 14px; font-weight: 600; }
+
+.feedback-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.feedback-due { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+.start-btn {
+  background: var(--accent-gradient);
+  color: #051217;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.start-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+/* Right column */
+.right-col { display: flex; flex-direction: column; }
+
+/* Progress ring */
+.progress-ring-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 6px auto 4px;
+}
+
+.progress-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+.ring-track {
+  fill: none;
+  stroke: var(--bg-card-alt);
+  stroke-width: 14;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-dasharray: 439.8;
+  stroke-dashoffset: 439.8;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.progress-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-percent { font-size: 26px; font-weight: 800; }
+.progress-caption { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+
+/* Meeting card */
+.meeting-card { display: flex; flex-direction: column; gap: 10px; }
+
+.meeting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.meeting-label { font-size: 12px; color: var(--text-muted); }
+.meeting-value { font-size: 13px; font-weight: 600; }
+
+/* Footer */
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* ===================== LIGHT MODE ===================== */
+
+body.light-mode {
+  --bg-app: #f4f6f9;
+  --bg-sidebar: #ffffff;
+  --bg-topbar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-alt: #f4f6f9;
+  --border-subtle: #e4e9ef;
+  --text-primary: #101828;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 1080px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .bottom-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); }
+  body.sidebar-open .sidebar { transform: translateX(0); }
+  .main-wrapper { margin-left: 0; }
+  .profile-text { display: none; }
+}
+
+@media (max-width: 560px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .content { padding: 18px 16px 8px; }
+  .banner { flex-direction: column; text-align: center; padding: 24px 20px; }
+  .feedback-meta { margin-left: 0; width: 100%; justify-content: space-between; }
+  .topbar { padding: 12px 16px; }
+}
+
+/* =========================================================
+   Multi-page Parent Portal — additional styles
+   ========================================================= */
+
+/* ---------- Page switching ---------- */
+.page { display: none; }
+.page.active { display: block; }
+
+.page-heading { margin-bottom: 20px; }
+.page-heading h1 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+.page-heading p { margin: 0; color: var(--text-secondary); font-size: 13.5px; }
+
+/* ---------- Mini announcement list (dashboard) ---------- */
+.mini-announce-list { display: flex; flex-direction: column; gap: 10px; }
+
+.mini-announce-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.mini-announce-item:hover { border-color: #2a3a4a; }
+.mini-announce-item .ma-emoji { font-size: 16px; flex-shrink: 0; }
+.mini-announce-item .ma-body { display: flex; flex-direction: column; gap: 2px; }
+.mini-announce-item .ma-title { font-size: 12.5px; font-weight: 600; }
+.mini-announce-item .ma-date { font-size: 11px; color: var(--text-muted); }
+
+/* ---------- Profile page ---------- */
+.info-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.info-row .info-label { font-size: 12px; color: var(--text-muted); }
+.info-row .info-value { font-size: 13px; font-weight: 600; text-align: right; }
+
+.panel-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background: var(--accent-gradient);
+  color: #051217;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; }
+
+.btn-secondary {
+  background: var(--bg-card-alt);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+.btn-secondary:hover { background: #1a2431; }
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+}
+.btn-danger:hover { filter: brightness(1.1); }
+
+.full-width { width: 100%; }
+
+/* ---------- Feedback Forms grid ---------- */
+.forms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.form-card:hover { transform: translateY(-2px); border-color: #2a3a4a; }
+.form-card.disabled { opacity: 0.6; }
+
+.form-card-top { display: flex; align-items: center; justify-content: space-between; }
+.form-card-title { font-size: 15.5px; font-weight: 700; }
+
+.badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.badge-new { background: var(--green-bg); color: var(--green); }
+.badge-soon { background: rgba(148, 163, 184, 0.16); color: var(--text-secondary); }
+
+.form-card-meta { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 6px; }
+.meta-line { display: flex; justify-content: space-between; font-size: 12.5px; }
+.meta-line .meta-key { color: var(--text-muted); }
+.meta-line .meta-val { font-weight: 600; }
+
+/* ---------- Announcements grid ---------- */
+.announce-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.announce-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.announce-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.announce-card-title { font-size: 14.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.announce-card-date { font-size: 12px; color: var(--text-muted); }
+.announce-card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+.badge-high { background: rgba(239, 68, 68, 0.14); color: #ef4444; }
+.badge-medium { background: var(--amber-bg); color: var(--amber); }
+.badge-low { background: var(--teal-bg); color: var(--accent-teal); }
+
+.announce-actions { display: flex; gap: 10px; margin-top: 6px; }
+
+/* ---------- Submission history table ---------- */
+.table-panel { overflow-x: auto; }
+
+.history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.history-table th {
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.history-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.history-table tr:last-child td { border-bottom: none; }
+
+.status-pill {
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent-teal);
+  font-weight: 600;
+  font-size: 12.5px;
+}
+.link-btn:hover { text-decoration: underline; }
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 20px 0 4px;
+  display: none;
+}
+.empty-state.visible { display: block; }
+
+/* ---------- Settings page ---------- */
+.settings-links { display: flex; flex-direction: column; gap: 4px; }
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 4px;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  text-align: left;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { color: var(--accent-teal); }
+.settings-row .chevron { color: var(--text-muted); }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.toggle-row:last-of-type { border-bottom: none; }
+
+.settings-field { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.settings-field label { font-size: 12px; color: var(--text-muted); }
+.settings-field select {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* Accent Color swatches */
+.accent-color-row { display: flex; align-items: center; gap: 16px; padding: 10px 4px 4px; }
+.accent-swatch {
+  --swatch-color: #2f7de1;
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--swatch-color);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.accent-swatch:hover { transform: translateY(-2px); }
+.accent-swatch-check {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.accent-swatch.selected { border-color: var(--text-primary); }
+.accent-swatch.selected .accent-swatch-check { opacity: 1; }
+
+/* Toggle switch */
+.switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 16px; height: 16px;
+  left: 2px; top: 2px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.switch input:checked + .slider { background: var(--accent-gradient); border-color: transparent; }
+.switch input:checked + .slider::before { transform: translateX(18px); background: #051217; }
+
+/* ---------- Star rating ---------- */
+.star-rating { display: flex; gap: 4px; font-size: 22px; }
+.star-rating span { cursor: pointer; color: var(--border-subtle); transition: color 0.1s ease; }
+.star-rating span.filled { color: var(--amber); }
+
+.question-block {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.question-text { font-size: 13px; margin-bottom: 8px; }
+
+.radio-row { display: flex; gap: 20px; }
+.radio-row label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+
+.autofill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.autofill-grid .info-row { background: none; border: none; padding: 4px 0; }
+
+textarea {
+  width: 100%;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ---------- Modals ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 10, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  animation: modalPop 0.18s ease;
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-sm { max-width: 380px; padding: 26px; text-align: center; }
+.modal-md { max-width: 460px; }
+.modal-lg { max-width: 620px; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.modal-header h3 { margin: 0; font-size: 15.5px; }
+.modal-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 15px; width: 28px; height: 28px; border-radius: 50%;
+}
+.modal-close:hover { background: var(--bg-card-alt); color: var(--text-primary); }
+
+.modal-body { padding: 20px 22px; }
+
+.form-grid { display: flex; flex-direction: column; gap: 14px; }
+.form-grid label { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: var(--text-muted); }
+.form-grid input {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.success-modal h3 { margin: 10px 0 4px; font-size: 17px; }
+.success-icon { font-size: 40px; }
+.success-sub { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
+.success-details {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  text-align: left;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+}
+.success-details .sd-row { display: flex; justify-content: space-between; }
+.success-details .sd-key { color: var(--text-muted); }
+.success-details .sd-val { font-weight: 600; }
+
+.confirm-modal h3 { margin: 0 0 8px; font-size: 16.5px; }
+.confirm-modal p { color: var(--text-secondary); font-size: 13.5px; margin: 0 0 18px; }
+.confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+/* ---------- Login screen ---------- */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-app);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.login-screen.open { display: flex; }
+.login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 40px 34px;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+.login-card h2 { margin: 0 0 8px; font-size: 19px; }
+.login-card p { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
+
+/* ---------- Responsive additions ---------- */
+@media (max-width: 900px) {
+  .forms-grid, .announce-grid { grid-template-columns: 1fr; }
+  .autofill-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- Feedback form action row (Cancel + Submit) ---------- */
+.form-action-row {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.form-action-row .btn-secondary,
+.form-action-row .btn-primary { flex: 0 0 auto; }
+@media (max-width: 480px) {
+  .form-action-row { flex-direction: column-reverse; }
+  .form-action-row .btn-secondary,
+  .form-action-row .btn-primary { width: 100%; }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-text">
+        <span class="brand-title">AFMS</span>
+        <span class="brand-subtitle">Parent Portal</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">▦</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-page="profile">
+        <span class="nav-icon">◒</span> My Profile
+      </a>
+
+      <div class="nav-section-label">Feedback</div>
+      <a href="#" class="nav-item" data-page="forms">
+        <span class="nav-icon">▤</span> Available Feedback Forms
+      </a>
+      <a href="#" class="nav-item" data-page="history">
+        <span class="nav-icon">◷</span> Submission History
+      </a>
+
+      <div class="nav-section-label">Updates</div>
+      <a href="#" class="nav-item" data-page="announcements">
+        <span class="nav-icon">◉</span> Announcements
+      </a>
+
+      <div class="nav-section-label">System</div>
+      <a href="#" class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙</span> Settings
+      </a>
+    </nav>
+
+    <a href="#" class="nav-item logout" id="logoutBtn">
+      <span class="nav-icon">⎋</span> Logout
+    </a>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <div class="main-wrapper">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-title">
+          <span class="topbar-title-main">Autonomous College</span>
+          <span class="topbar-title-sub" id="pageBreadcrumb">Parent Portal · Dashboard</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">☀</button>
+        <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+
+        <div class="profile-menu">
+          <button class="profile-trigger" id="profileTrigger">
+            <div class="profile-text">
+              <span class="profile-name" id="topbarParentName">Mr. Siddiqui</span>
+              <span class="profile-id" id="topbarParentId">PAR1208</span>
+            </div>
+            <div class="avatar">S</div>
+          </button>
+
+          <div class="profile-dropdown" id="profileDropdown">
+            <a href="#" data-page="profile">My Profile</a>
+            <a href="#" data-page="settings">Settings</a>
+            <a href="#" id="dropdownLogout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== PAGE: DASHBOARD ===================== -->
+    <main class="content page active" id="page-dashboard">
+
+      <section class="banner">
+        <div class="banner-icon">📖</div>
+        <div class="banner-text">
+          <span class="banner-eyebrow">Parent Dashboard</span>
+          <h1 class="banner-title">Welcome Back, Parent!</h1>
+          <p class="banner-sub">
+            Thank you for supporting your child's education. Your feedback helps us
+            improve the learning experience. You have <strong id="pendingCountText">2</strong> pending forms.
+          </p>
+        </div>
+      </section>
+
+      <section class="stat-grid">
+        <div class="stat-card clickable" data-page="forms" role="button" tabindex="0" aria-label="View pending feedback forms">
+          <div class="stat-icon icon-amber">◷</div>
+          <div class="stat-body">
+            <span class="stat-label">Pending Feedback</span>
+            <span class="stat-value" id="statPending">2</span>
+          </div>
+        </div>
+
+        <div class="stat-card clickable" data-page="history" role="button" tabindex="0" aria-label="View submission history">
+          <div class="stat-icon icon-green">✓</div>
+          <div class="stat-body">
+            <span class="stat-label">Feedback Submitted</span>
+            <span class="stat-value" id="statSubmitted">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card clickable" data-page="announcements" role="button" tabindex="0" aria-label="View announcements">
+          <div class="stat-icon icon-indigo">📣</div>
+          <div class="stat-body">
+            <span class="stat-label">Announcements</span>
+            <span class="stat-value" id="statAnnouncements">7</span>
+          </div>
+        </div>
+
+        <div class="stat-card clickable" data-page="attendance" role="button" tabindex="0" aria-label="View child attendance">
+          <div class="stat-icon icon-teal">◔</div>
+          <div class="stat-body">
+            <span class="stat-label">Child Attendance</span>
+            <span class="stat-value" id="statAttendance">92%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-grid">
+
+        <div class="panel priority-panel">
+          <div class="panel-header">
+            <h2>Priority Parent Feedback</h2>
+            <a href="#" class="view-all-btn" data-page="forms">View All</a>
+          </div>
+          <div class="feedback-list" id="feedbackList"></div>
+        </div>
+
+        <div class="right-col">
+
+          <div class="panel progress-panel">
+            <h2>Feedback Completion</h2>
+            <div class="progress-ring-wrap">
+              <svg class="progress-ring" viewBox="0 0 160 160">
+                <circle class="ring-track" cx="80" cy="80" r="70"></circle>
+                <circle class="ring-fill" id="progressRing" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="progress-ring-label">
+                <span class="progress-percent" id="progressPercent">78%</span>
+                <span class="progress-caption">Completed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel announce-panel">
+            <div class="panel-header">
+              <h2>Latest Announcements</h2>
+              <a href="#" class="view-all-btn" data-page="announcements">View All</a>
+            </div>
+            <div class="mini-announce-list" id="miniAnnounceList"></div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== PAGE: CHILD ATTENDANCE ===================== -->
+    <main class="content page" id="page-attendance">
+      <div class="page-heading">
+        <h1>Child Attendance</h1>
+        <p>A detailed overview of your child's attendance record.</p>
+      </div>
+
+      <section class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-teal">◔</div>
+          <div class="stat-body">
+            <span class="stat-label">Overall Attendance</span>
+            <span class="stat-value" id="attOverallPercent">92%</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-green">✓</div>
+          <div class="stat-body">
+            <span class="stat-label">Present Classes</span>
+            <span class="stat-value" id="attPresent">184</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-amber">✕</div>
+          <div class="stat-body">
+            <span class="stat-label">Absent Classes</span>
+            <span class="stat-value" id="attAbsent">16</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-indigo">▦</div>
+          <div class="stat-body">
+            <span class="stat-label">Total Classes</span>
+            <span class="stat-value" id="attTotal">200</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-grid">
+        <div class="panel priority-panel table-panel">
+          <div class="panel-header">
+            <h2>Monthly Attendance</h2>
+          </div>
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Present</th>
+                <th>Absent</th>
+                <th>Total</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody id="attMonthlyBody"></tbody>
+          </table>
+        </div>
+
+        <div class="right-col">
+          <div class="panel">
+            <h2>Subject-wise Attendance</h2>
+            <div class="info-list" id="attSubjectList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== PAGE: MY PROFILE ===================== -->
+    <main class="content page" id="page-profile">
+      <div class="page-heading">
+        <h1>My Profile</h1>
+        <p>Manage your account details and your child's academic information.</p>
+      </div>
+
+      <section class="bottom-grid profile-grid">
+        <div class="panel">
+          <h2>Parent Information</h2>
+          <div class="info-list" id="parentInfoList"></div>
+          <div class="panel-actions">
+            <button class="btn-primary" id="editProfileBtn">Edit Profile</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Student Information</h2>
+          <div class="info-list" id="studentInfoList"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== PAGE: AVAILABLE FEEDBACK FORMS ===================== -->
+    <main class="content page" id="page-forms">
+      <div class="page-heading">
+        <h1>Available Feedback Forms</h1>
+        <p>Share your feedback to help us improve your child's experience.</p>
+      </div>
+
+      <section class="forms-grid" id="formsGrid"></section>
+    </main>
+
+    <!-- ===================== PAGE: SUBMISSION HISTORY ===================== -->
+    <main class="content page" id="page-history">
+      <div class="page-heading">
+        <h1>Submission History</h1>
+        <p>A record of every feedback form you've submitted.</p>
+      </div>
+
+      <section class="panel table-panel">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Feedback Title</th>
+              <th>Parent Name</th>
+              <th>Student Name</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+        <p class="empty-state" id="historyEmptyState">No submissions yet. Completed forms will appear here.</p>
+      </section>
+    </main>
+
+    <!-- ===================== PAGE: ANNOUNCEMENTS ===================== -->
+    <main class="content page" id="page-announcements">
+      <div class="page-heading">
+        <h1>Announcements</h1>
+        <p>Stay up to date with the latest news from Autonomous College.</p>
+      </div>
+
+      <section class="announce-grid" id="announceGrid"></section>
+    </main>
+
+    <!-- ===================== PAGE: SETTINGS ===================== -->
+    <main class="content page" id="page-settings">
+      <div class="page-heading">
+        <h1>Settings</h1>
+        <p>Manage your account, notifications, and preferences.</p>
+      </div>
+
+      <section class="bottom-grid settings-grid">
+        <div class="right-col">
+
+          <div class="panel">
+            <h2>Account</h2>
+            <div class="settings-links">
+              <button class="settings-row" id="settingsEditProfile">
+                <span>Edit Profile</span><span class="chevron">›</span>
+              </button>
+              <button class="settings-row" id="settingsUpdateEmail">
+                <span>Update Email</span><span class="chevron">›</span>
+              </button>
+              <button class="settings-row" id="settingsUpdateMobile">
+                <span>Update Mobile Number</span><span class="chevron">›</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Account Security</h2>
+            <form id="accountSecurityForm" class="form-grid">
+              <label>Current Password<input type="password" id="currentPasswordInput" required></label>
+              <label>New Password<input type="password" id="newPasswordInput" required></label>
+              <label>Confirm Password<input type="password" id="confirmPasswordInput" required></label>
+              <button type="submit" class="btn-primary full-width">Save Password</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h2>Notifications</h2>
+            <div class="toggle-row">
+              <span>Feedback Notifications</span>
+              <label class="switch"><input type="checkbox" checked data-toggle="feedback"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <span>Announcement Notifications</span>
+              <label class="switch"><input type="checkbox" checked data-toggle="announcement"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <span>Fee Reminder Notifications</span>
+              <label class="switch"><input type="checkbox" checked data-toggle="fee"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <span>Examination Notifications</span>
+              <label class="switch"><input type="checkbox" checked data-toggle="exam"><span class="slider"></span></label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="right-col">
+
+          <div class="panel">
+            <h2>Appearance</h2>
+            <div class="toggle-row">
+              <span>Dark Mode</span>
+              <label class="switch"><input type="checkbox" id="settingsDarkModeToggle" checked><span class="slider"></span></label>
+            </div>
+            <div class="settings-field">
+              <label for="languageSelect">Language</label>
+              <select id="languageSelect">
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Marathi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Accent Color</h2>
+            <div class="accent-color-row" id="accentColorRow">
+              <button class="accent-swatch" data-accent="blue" style="--swatch-color: #2f7de1" aria-label="Blue (Default)" title="Blue (Default)">
+                <span class="accent-swatch-check">✓</span>
+              </button>
+              <button class="accent-swatch" data-accent="teal" style="--swatch-color: #14b8a6" aria-label="Teal" title="Teal">
+                <span class="accent-swatch-check">✓</span>
+              </button>
+              <button class="accent-swatch" data-accent="emerald" style="--swatch-color: #10b981" aria-label="Emerald" title="Emerald">
+                <span class="accent-swatch-check">✓</span>
+              </button>
+              <button class="accent-swatch" data-accent="rose" style="--swatch-color: #f43f5e" aria-label="Rose" title="Rose">
+                <span class="accent-swatch-check">✓</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Privacy</h2>
+            <div class="settings-links">
+              <button class="settings-row" data-info="Privacy Policy"><span>Privacy Policy</span><span class="chevron">›</span></button>
+              <button class="settings-row" data-info="Terms &amp; Conditions"><span>Terms &amp; Conditions</span><span class="chevron">›</span></button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Help &amp; Support</h2>
+            <div class="settings-links">
+              <button class="settings-row" data-info="FAQs"><span>FAQs</span><span class="chevron">›</span></button>
+              <button class="settings-row" data-info="Contact School"><span>Contact School</span><span class="chevron">›</span></button>
+              <button class="settings-row" data-info="Report an Issue"><span>Report an Issue</span><span class="chevron">›</span></button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>© 2026 Autonomous Feedback Management System — Autonomous College</span>
+      <span>Parent Portal v2.0</span>
+    </footer>
+  </div>
+
+  <!-- ===================== MODAL: FEEDBACK FORM ===================== -->
+  <div class="modal-overlay" id="feedbackModalOverlay">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="feedbackModalTitle">Feedback Form</h3>
+        <button class="modal-close" data-close-modal="feedbackModalOverlay">✕</button>
+      </div>
+      <div class="modal-body" id="feedbackModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: SUBMISSION SUCCESS ===================== -->
+  <div class="modal-overlay" id="successModalOverlay">
+    <div class="modal modal-sm success-modal">
+      <div class="success-icon">✅</div>
+      <h3>Feedback Submitted Successfully!</h3>
+      <p class="success-sub">Thank you for sharing your valuable feedback.</p>
+      <div class="success-details" id="successDetails"></div>
+      <button class="btn-primary full-width" id="successOkBtn">OK</button>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: VIEW SUBMISSION (read-only) ===================== -->
+  <div class="modal-overlay" id="viewModalOverlay">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="viewModalTitle">Submitted Feedback</h3>
+        <button class="modal-close" data-close-modal="viewModalOverlay">✕</button>
+      </div>
+      <div class="modal-body" id="viewModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: EDIT PROFILE ===================== -->
+  <div class="modal-overlay" id="editProfileModalOverlay">
+    <div class="modal modal-md">
+      <div class="modal-header">
+        <h3>Edit Profile</h3>
+        <button class="modal-close" data-close-modal="editProfileModalOverlay">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm" class="form-grid">
+          <label>Parent Name<input type="text" id="editParentName"></label>
+          <label>Email<input type="email" id="editParentEmail"></label>
+          <label>Mobile Number<input type="tel" id="editParentMobile"></label>
+          <label>Address<input type="text" id="editParentAddress"></label>
+          <button type="submit" class="btn-primary full-width">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: LOGOUT CONFIRM ===================== -->
+  <div class="modal-overlay" id="logoutModalOverlay">
+    <div class="modal modal-sm confirm-modal">
+      <h3>Logout Confirmation</h3>
+      <p>Are you sure you want to logout?</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" data-close-modal="logoutModalOverlay">Cancel</button>
+        <button class="btn-danger" id="confirmLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: INFO (generic) ===================== -->
+  <div class="modal-overlay" id="infoModalOverlay">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 id="infoModalTitle">Info</h3>
+        <button class="modal-close" data-close-modal="infoModalOverlay">✕</button>
+      </div>
+      <div class="modal-body"><p id="infoModalBody"></p></div>
+    </div>
+  </div>
+
+  <!-- ===================== LOGIN SCREEN (shown after logout) ===================== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="brand-icon" style="width:52px;height:52px;font-size:24px;margin:0 auto 14px;">🎓</div>
+      <h2>Parent Portal</h2>
+      <p>You have been logged out. Please sign in to continue.</p>
+      <button class="btn-primary full-width" id="reLoginBtn">Log In Again</button>
+    </div>
+  </div>
+
+  <script>
+/* =========================================================
+   AFMS — Parent Portal
+   Full front-end logic: routing between pages, dynamic
+   feedback forms, submission tracking, profile/settings
+   editing, and session (logout) handling.
+   All data is simulated with an in-memory + localStorage
+   state object — no backend required.
+   ========================================================= */
+
+/* ============================================================
+   1. STATIC REFERENCE DATA
+   ============================================================ */
+
+const ACTIVE_FORMS = [
+  {
+    id: "teacher-comm",
+    icon: "👨‍🏫",
+    title: "Teacher Communication Feedback",
+    assignedBy: "School Administration",
+    dueDate: "26 July 2026",
+    estTime: "5 Minutes",
+    autofill: ["parent", "student", "prn", "yearLevel", "division", "department", "academicYear"],
+    questions: [
+      { id: "q1", type: "star", text: "How satisfied are you with the communication from your child's teacher regarding academic progress?" },
+      { id: "q2", type: "star", text: "Does the teacher regularly update you about your child's performance?" },
+      { id: "q3", type: "star", text: "Are your concerns or queries addressed promptly by the teacher?" },
+      { id: "q4", type: "star", text: "Are parent-teacher meetings helpful in understanding your child's progress?" },
+      { id: "q5", type: "star", text: "Do you feel the teacher provides appropriate guidance and support for your child's learning?" },
+      { id: "q6", type: "star", text: "Overall, how satisfied are you with the teacher's communication and support?" },
+    ],
+    suggestionsPrompt: "Please provide any suggestions or comments to improve communication between teachers and parents.",
+  },
+  {
+    id: "school-facilities",
+    icon: "🏫",
+    title: "School Facilities & Parent Experience Feedback",
+    assignedBy: "School Administration",
+    dueDate: "30 July 2026",
+    estTime: "5 Minutes",
+    autofill: ["parent", "student", "prn", "yearLevel", "division", "department", "academicYear"],
+    questions: [
+      { id: "q1", type: "star", text: "How satisfied are you with the cleanliness and maintenance of the school?" },
+      { id: "q2", type: "star", text: "Do you feel the school provides a safe and secure environment for your child?" },
+      { id: "q3", type: "star", text: "How satisfied are you with the communication from the school regarding important announcements and events?" },
+      { id: "q4", type: "star", text: "Are you satisfied with the school's facilities and learning environment?" },
+      { id: "q5", type: "star", text: "Do you believe the school supports your child's overall growth and well-being?" },
+      { id: "q6", type: "star", text: "Overall, how satisfied are you with your experience as a parent?" },
+    ],
+    suggestionsPrompt: "Please share any suggestions or recommendations to improve the school's services.",
+  },
+];
+
+const COMING_SOON_FORMS = [
+  "Parent-School Communication Survey",
+  "Student Well-being Feedback",
+  "School Safety & Security Feedback",
+  "Transport Service Feedback",
+];
+
+const ANNOUNCEMENTS = [
+  { id: "a1", icon: "📢", title: "Teacher Communication Feedback Released", date: "20 Jul 2026", priority: "high", desc: "Parents are requested to complete the teacher communication feedback form before the due date.", pdf: false },
+  { id: "a2", icon: "📢", title: "Mid-Term Examination Schedule Released", date: "19 Jul 2026", priority: "high", desc: "The mid-term examination timetable for all classes has been published. Please review the attached schedule.", pdf: true },
+  { id: "a3", icon: "📢", title: "Holiday Notice", date: "17 Jul 2026", priority: "medium", desc: "The school will remain closed on account of a regional holiday. Classes resume the following day.", pdf: false },
+  { id: "a4", icon: "📢", title: "Fee Payment Reminder", date: "15 Jul 2026", priority: "high", desc: "This is a reminder that Term 2 fees are due by the end of this month. Late payments may incur a fee.", pdf: true },
+  { id: "a5", icon: "📢", title: "Annual Day Registration", date: "12 Jul 2026", priority: "low", desc: "Registration is now open for the Annual Day cultural program. Interested students may sign up via their class teacher.", pdf: false },
+  { id: "a6", icon: "📢", title: "Parent Workshop", date: "10 Jul 2026", priority: "medium", desc: "A workshop on supporting learning at home will be held for interested parents. Seats are limited.", pdf: false },
+  { id: "a7", icon: "📢", title: "School Circular", date: "08 Jul 2026", priority: "low", desc: "General circular regarding updated pickup and drop-off timings for the new term.", pdf: true },
+];
+
+const INFO_TEXT = {
+  "Privacy Policy": "Autonomous College is committed to protecting the privacy of parents and students. Personal information collected through this portal is used solely for academic communication and feedback purposes.",
+  "Terms & Conditions": "By using the AFMS Parent Portal, you agree to provide accurate information and to use the feedback system responsibly and respectfully.",
+  "FAQs": "Common questions about the Parent Portal, feedback submission, and account management are answered in the school's help centre.",
+  "Contact School": "You can reach the school office at contact@autonomouscollege.edu or through the front office during working hours.",
+  "Report an Issue": "If you're experiencing a technical issue with the portal, please describe the problem and our support team will get back to you shortly.",
+};
+
+/* ============================================================
+   2. STATE (persisted to localStorage)
+   ============================================================ */
+
+const STORAGE_KEY = "afms_parent_portal_state";
+
+function defaultState() {
+  return {
+    parent: {
+      name: "Mr. Siddiqui",
+      id: "PAR1208",
+      email: "siddiqui.parent@gmail.com",
+      mobile: "+91 98765 43210",
+      address: "Mumbai, Maharashtra",
+      relationship: "Father",
+    },
+    student: {
+      name: "Iram Siddiqui",
+      prn: "125UIT1208",
+      yearLevel: "First Year (FY B.Tech)",
+      division: "A",
+      department: "Information Technology (IT)",
+      academicYear: "2025–2026",
+      attendance: "92%", // retained for the dashboard attendance stat card only
+    },
+    stats: {
+      announcements: ANNOUNCEMENTS.length,
+    },
+    attendanceDetail: {
+      present: 184,
+      absent: 16,
+      total: 200,
+      monthly: [
+        { month: "July 2026", present: 9, absent: 1, total: 10 },
+        { month: "June 2026", present: 32, absent: 2, total: 34 },
+        { month: "May 2026", present: 33, absent: 3, total: 36 },
+        { month: "April 2026", present: 35, absent: 3, total: 38 },
+        { month: "March 2026", present: 37, absent: 3, total: 40 },
+        { month: "February 2026", present: 38, absent: 4, total: 42 },
+      ],
+      subjects: [
+        { name: "Mathematics", percent: 95 },
+        { name: "Physics", percent: 90 },
+        { name: "Programming Fundamentals", percent: 93 },
+        { name: "English", percent: 88 },
+        { name: "Engineering Graphics", percent: 91 },
+        { name: "Environmental Studies", percent: 94 },
+      ],
+    },
+    submittedFormIds: [],
+    submissions: [],
+  };
+}
+
+let state = loadState();
+// Backfill for sessions saved under the previous data shape
+if (!state.student.prn) state.student.prn = "125UIT1208";
+if (!state.student.yearLevel) state.student.yearLevel = state.student.class || "First Year (FY B.Tech)";
+if (!state.student.academicYear) state.student.academicYear = state.student.year || "2025–2026";
+if (!state.attendanceDetail) state.attendanceDetail = defaultState().attendanceDetail;
+delete state.student.roll;
+delete state.student.class;
+delete state.student.year;
+delete state.student.classTeacher;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    // basic shape guard
+    if (!parsed.parent || !parsed.student || !parsed.stats) return defaultState();
+    return parsed;
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn("Could not persist state:", e);
+  }
+}
+
+/* ============================================================
+   2b. ACCENT COLOR (Settings page only — CSS-variable theming)
+   ------------------------------------------------------------
+   Overrides the same CSS custom properties the rest of the
+   portal already uses for its accent (sidebar active state,
+   primary buttons, links, badges, highlights) so no other CSS
+   rule needs to change. Persisted separately in localStorage.
+   ============================================================ */
+
+const ACCENT_STORAGE_KEY = "afms_accent_color";
+
+const ACCENT_THEMES = {
+  blue: {
+    // Matches the portal's original default accent exactly.
+    teal: "#17b8c9",
+    blue: "#2f7de1",
+    gradient: "linear-gradient(120deg, #16b8cf 0%, #1c8fe0 60%, #2f6fe0 100%)",
+    tealBg: "rgba(23, 184, 201, 0.14)",
+  },
+  teal: {
+    teal: "#14b8a6",
+    blue: "#0d9488",
+    gradient: "linear-gradient(120deg, #0d9488 0%, #14b8a6 60%, #2dd4bf 100%)",
+    tealBg: "rgba(20, 184, 166, 0.14)",
+  },
+  emerald: {
+    teal: "#10b981",
+    blue: "#059669",
+    gradient: "linear-gradient(120deg, #059669 0%, #10b981 60%, #34d399 100%)",
+    tealBg: "rgba(16, 185, 129, 0.14)",
+  },
+  rose: {
+    teal: "#f43f5e",
+    blue: "#e11d48",
+    gradient: "linear-gradient(120deg, #e11d48 0%, #f43f5e 60%, #fb7185 100%)",
+    tealBg: "rgba(244, 63, 94, 0.14)",
+  },
+};
+
+function getSavedAccentColor() {
+  try {
+    return localStorage.getItem(ACCENT_STORAGE_KEY) || "blue";
+  } catch (e) {
+    return "blue";
+  }
+}
+
+function saveAccentColor(name) {
+  try {
+    localStorage.setItem(ACCENT_STORAGE_KEY, name);
+  } catch (e) {
+    console.warn("Could not persist accent color:", e);
+  }
+}
+
+function applyAccentColor(name) {
+  const theme = ACCENT_THEMES[name] ? name : "blue";
+  const t = ACCENT_THEMES[theme];
+  const root = document.documentElement.style;
+  root.setProperty("--accent-teal", t.teal);
+  root.setProperty("--accent-blue", t.blue);
+  root.setProperty("--accent-gradient", t.gradient);
+  root.setProperty("--teal-bg", t.tealBg);
+
+  document.querySelectorAll(".accent-swatch").forEach((el) => {
+    el.classList.toggle("selected", el.dataset.accent === theme);
+  });
+}
+
+function getPendingForms() {
+  return ACTIVE_FORMS.filter((f) => !state.submittedFormIds.includes(f.id));
+}
+
+function getPendingCount() {
+  return getPendingForms().length;
+}
+
+function getSubmittedCount() {
+  // Always derived from the actual submission records — never hardcoded.
+  return state.submissions.length;
+}
+
+function getCompletionPercent() {
+  const submitted = getSubmittedCount();
+  const total = submitted + getPendingCount();
+  if (total === 0) return 100;
+  return Math.round((submitted / total) * 100);
+}
+
+/* ============================================================
+   3. PAGE ROUTING
+   ============================================================ */
+
+const PAGE_TITLES = {
+  dashboard: "Parent Portal · Dashboard",
+  profile: "Parent Portal · My Profile",
+  forms: "Parent Portal · Available Feedback Forms",
+  history: "Parent Portal · Submission History",
+  announcements: "Parent Portal · Announcements",
+  settings: "Parent Portal · Settings",
+  attendance: "Parent Portal · Child Attendance",
+};
+
+function switchPage(pageId) {
+  document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
+  const target = document.getElementById(`page-${pageId}`);
+  if (target) target.classList.add("active");
+
+  document.querySelectorAll(".nav-item[data-page]").forEach((item) => {
+    item.classList.toggle("active", item.dataset.page === pageId);
+  });
+
+  const breadcrumb = document.getElementById("pageBreadcrumb");
+  if (breadcrumb) breadcrumb.textContent = PAGE_TITLES[pageId] || "Parent Portal";
+
+  // Re-render the target page's content each time it's opened
+  if (pageId === "dashboard") renderDashboard();
+  if (pageId === "profile") renderProfile();
+  if (pageId === "forms") renderForms();
+  if (pageId === "history") renderHistory();
+  if (pageId === "announcements") renderAnnouncements();
+  if (pageId === "attendance") renderAttendance();
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Close mobile sidebar after navigating
+  if (window.innerWidth <= 860) document.body.classList.remove("sidebar-open");
+}
+
+/* ============================================================
+   4. RENDER: DASHBOARD
+   ============================================================ */
+
+function renderDashboard() {
+  const pending = getPendingCount();
+  const completion = getCompletionPercent();
+
+  document.getElementById("statPending").textContent = pending;
+  document.getElementById("statSubmitted").textContent = getSubmittedCount();
+  document.getElementById("statAnnouncements").textContent = state.stats.announcements;
+  const attDetail = state.attendanceDetail;
+  const attPercent = attDetail.total === 0 ? 0 : Math.round((attDetail.present / attDetail.total) * 100);
+  document.getElementById("statAttendance").textContent = `${attPercent}%`;
+  document.getElementById("pendingCountText").textContent = pending;
+
+  // Priority feedback list — show remaining active forms
+  const listEl = document.getElementById("feedbackList");
+  const pendingForms = getPendingForms();
+  listEl.innerHTML = "";
+
+  if (pendingForms.length === 0) {
+    listEl.innerHTML = `<p class="empty-state visible">You're all caught up — no pending feedback forms.</p>`;
+  } else {
+    pendingForms.forEach((form) => {
+      const row = document.createElement("div");
+      row.className = "feedback-row";
+      row.innerHTML = `
+        <div class="feedback-icon">${form.icon}</div>
+        <div class="feedback-main">
+          <span class="feedback-badge">New Feedback</span>
+          <span class="feedback-title">${form.title}</span>
+        </div>
+        <div class="feedback-meta">
+          <span class="feedback-due">Due: ${form.dueDate}</span>
+          <button class="start-btn" data-form-id="${form.id}">Start Now</button>
+        </div>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+
+  // Progress ring
+  setProgressRing(completion);
+
+  // Mini announcements (latest 3)
+  const miniList = document.getElementById("miniAnnounceList");
+  miniList.innerHTML = "";
+  ANNOUNCEMENTS.slice(0, 3).forEach((a) => {
+    const item = document.createElement("div");
+    item.className = "mini-announce-item";
+    item.dataset.page = "announcements";
+    item.innerHTML = `
+      <span class="ma-emoji">${a.icon}</span>
+      <div class="ma-body">
+        <span class="ma-title">${a.title}</span>
+        <span class="ma-date">${a.date}</span>
+      </div>
+    `;
+    miniList.appendChild(item);
+  });
+}
+
+function setProgressRing(percent) {
+  const ring = document.getElementById("progressRing");
+  const label = document.getElementById("progressPercent");
+  const circumference = 2 * Math.PI * 70;
+  ring.style.strokeDasharray = `${circumference}`;
+  const offset = circumference - (percent / 100) * circumference;
+  requestAnimationFrame(() => {
+    ring.style.strokeDashoffset = `${offset}`;
+  });
+  label.textContent = `${percent}%`;
+}
+
+/* ============================================================
+   5. RENDER: PROFILE
+   ============================================================ */
+
+function infoRow(label, value) {
+  return `<div class="info-row"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`;
+}
+
+function renderProfile() {
+  document.getElementById("parentInfoList").innerHTML =
+    infoRow("Parent Name", state.parent.name) +
+    infoRow("Parent ID", state.parent.id) +
+    infoRow("Email", state.parent.email) +
+    infoRow("Mobile Number", state.parent.mobile) +
+    infoRow("Address", state.parent.address) +
+    infoRow("Relationship with Student", state.parent.relationship);
+
+  document.getElementById("studentInfoList").innerHTML =
+    infoRow("Student Name", state.student.name) +
+    infoRow("PRN Number", state.student.prn) +
+    infoRow("Year", state.student.yearLevel) +
+    infoRow("Division", state.student.division) +
+    infoRow("Department", state.student.department) +
+    infoRow("Academic Year", state.student.academicYear);
+
+  document.getElementById("topbarParentName").textContent = state.parent.name;
+  document.getElementById("topbarParentId").textContent = state.parent.id;
+  const avatarEl = document.querySelector(".profile-trigger .avatar");
+  if (avatarEl) avatarEl.textContent = state.parent.name.replace(/^Mr\.?|^Mrs\.?|^Ms\.?/i, "").trim().charAt(0).toUpperCase() || "P";
+}
+
+/* ============================================================
+   6. RENDER: AVAILABLE FEEDBACK FORMS
+   ============================================================ */
+
+function renderForms() {
+  const grid = document.getElementById("formsGrid");
+  grid.innerHTML = "";
+
+  getPendingForms().forEach((form) => {
+    const card = document.createElement("div");
+    card.className = "form-card";
+    card.innerHTML = `
+      <div class="form-card-top">
+        <span class="form-card-title">${form.icon} ${form.title}</span>
+        <span class="badge badge-new">New Feedback</span>
+      </div>
+      <div class="form-card-meta">
+        <div class="meta-line"><span class="meta-key">Assigned By</span><span class="meta-val">${form.assignedBy}</span></div>
+        <div class="meta-line"><span class="meta-key">Due Date</span><span class="meta-val">${form.dueDate}</span></div>
+        <div class="meta-line"><span class="meta-key">Estimated Time</span><span class="meta-val">${form.estTime}</span></div>
+        <div class="meta-line"><span class="meta-key">Status</span><span class="meta-val">Pending</span></div>
+      </div>
+      <button class="btn-primary" data-form-id="${form.id}">Give Feedback</button>
+    `;
+    grid.appendChild(card);
+  });
+
+  COMING_SOON_FORMS.forEach((title) => {
+    const card = document.createElement("div");
+    card.className = "form-card disabled";
+    card.innerHTML = `
+      <div class="form-card-top">
+        <span class="form-card-title">🕒 ${title}</span>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="form-card-meta">
+        <div class="meta-line"><span class="meta-key">Status</span><span class="meta-val">Not yet available</span></div>
+      </div>
+      <button class="btn-secondary" disabled>Give Feedback</button>
+    `;
+    grid.appendChild(card);
+  });
+
+  if (getPendingForms().length === 0) {
+    const note = document.createElement("p");
+    note.className = "empty-state visible";
+    note.style.gridColumn = "1 / -1";
+    note.textContent = "You've completed all active feedback forms. New forms will appear here when assigned.";
+    grid.prepend(note);
+  }
+}
+
+/* ============================================================
+   7. RENDER: SUBMISSION HISTORY
+   ============================================================ */
+
+function renderHistory() {
+  const body = document.getElementById("historyTableBody");
+  const emptyState = document.getElementById("historyEmptyState");
+  body.innerHTML = "";
+
+  if (state.submissions.length === 0) {
+    emptyState.classList.add("visible");
+    return;
+  }
+  emptyState.classList.remove("visible");
+
+  // Most recent first
+  [...state.submissions].reverse().forEach((sub) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${sub.title}</td>
+      <td>${sub.parentName}</td>
+      <td>${sub.studentName}</td>
+      <td>${sub.date}</td>
+      <td>${sub.time}</td>
+      <td><span class="status-pill">${sub.status}</span></td>
+      <td><button class="link-btn" data-view-id="${sub.id}">View</button></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   8. RENDER: ANNOUNCEMENTS
+   ============================================================ */
+
+function renderAnnouncements() {
+  const grid = document.getElementById("announceGrid");
+  grid.innerHTML = "";
+
+  ANNOUNCEMENTS.forEach((a) => {
+    const card = document.createElement("div");
+    card.className = "announce-card";
+    const badgeClass = a.priority === "high" ? "badge-high" : a.priority === "medium" ? "badge-medium" : "badge-low";
+    const badgeText = a.priority.charAt(0).toUpperCase() + a.priority.slice(1) + " Priority";
+    card.innerHTML = `
+      <div class="announce-card-top">
+        <span class="announce-card-title">${a.icon} ${a.title}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <span class="announce-card-date">${a.date}</span>
+      <p class="announce-card-desc">${a.desc}</p>
+      <div class="announce-actions">
+        <button class="btn-secondary" data-announce-view="${a.id}">View Details</button>
+        ${a.pdf ? `<button class="btn-secondary" data-announce-pdf="${a.id}">Download PDF</button>` : ""}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   8b. RENDER: CHILD ATTENDANCE
+   ============================================================ */
+
+function renderAttendance() {
+  const detail = state.attendanceDetail;
+  const overallPercent = detail.total === 0 ? 0 : Math.round((detail.present / detail.total) * 100);
+
+  document.getElementById("attOverallPercent").textContent = `${overallPercent}%`;
+  document.getElementById("attPresent").textContent = detail.present;
+  document.getElementById("attAbsent").textContent = detail.absent;
+  document.getElementById("attTotal").textContent = detail.total;
+
+  const monthlyBody = document.getElementById("attMonthlyBody");
+  monthlyBody.innerHTML = "";
+  detail.monthly.forEach((m) => {
+    const pct = m.total === 0 ? 0 : Math.round((m.present / m.total) * 100);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.month}</td>
+      <td>${m.present}</td>
+      <td>${m.absent}</td>
+      <td>${m.total}</td>
+      <td><span class="status-pill">${pct}%</span></td>
+    `;
+    monthlyBody.appendChild(tr);
+  });
+
+  const subjectList = document.getElementById("attSubjectList");
+  subjectList.innerHTML = detail.subjects.map((s) => infoRow(s.name, `${s.percent}%`)).join("");
+}
+
+/* ============================================================
+   9. FEEDBACK FORM MODAL
+   ============================================================ */
+
+function openFeedbackModal(formId) {
+  const form = ACTIVE_FORMS.find((f) => f.id === formId);
+  if (!form) return;
+
+  document.getElementById("feedbackModalTitle").textContent = form.title;
+
+  const autofillMap = {
+    parent: ["Parent Name", state.parent.name],
+    student: ["Student Name", state.student.name],
+    prn: ["PRN Number", state.student.prn],
+    yearLevel: ["Year", state.student.yearLevel],
+    division: ["Division", state.student.division],
+    department: ["Department", state.student.department],
+    academicYear: ["Academic Year", state.student.academicYear],
+  };
+
+  let autofillHtml = `<div class="autofill-grid">`;
+  form.autofill.forEach((key) => {
+    const [label, value] = autofillMap[key];
+    autofillHtml += infoRow(label, value);
+  });
+  autofillHtml += `</div>`;
+
+  let questionsHtml = "";
+  form.questions.forEach((q) => {
+    if (q.type === "star") {
+      questionsHtml += `
+        <div class="question-block">
+          <p class="question-text">${q.text}</p>
+          <div class="star-rating" data-question="${q.id}">
+            ${[1, 2, 3, 4, 5].map((n) => `<span data-value="${n}">★</span>`).join("")}
+          </div>
+        </div>
+      `;
+    } else if (q.type === "yesno") {
+      questionsHtml += `
+        <div class="question-block">
+          <p class="question-text">${q.text}</p>
+          <div class="radio-row" data-question="${q.id}">
+            <label><input type="radio" name="${q.id}" value="Yes"> Yes</label>
+            <label><input type="radio" name="${q.id}" value="No"> No</label>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  const bodyHtml = `
+    ${autofillHtml}
+    <form id="dynamicFeedbackForm">
+      ${questionsHtml}
+      <div class="question-block">
+        <p class="question-text">${form.suggestionsPrompt || "Suggestions for improvement"}</p>
+        <textarea id="feedbackSuggestions" placeholder="Share any additional thoughts…"></textarea>
+      </div>
+      <div class="form-action-row">
+        <button type="button" class="btn-secondary" data-close-modal="feedbackModalOverlay">Cancel</button>
+        <button type="submit" class="btn-primary">Submit Feedback</button>
+      </div>
+    </form>
+  `;
+
+  document.getElementById("feedbackModalBody").innerHTML = bodyHtml;
+
+  // Wire up star ratings
+  document.querySelectorAll("#dynamicFeedbackForm .star-rating").forEach((ratingEl) => {
+    const stars = ratingEl.querySelectorAll("span");
+    stars.forEach((star) => {
+      star.addEventListener("click", () => {
+        const value = Number(star.dataset.value);
+        ratingEl.dataset.selected = value;
+        stars.forEach((s) => s.classList.toggle("filled", Number(s.dataset.value) <= value));
+      });
+    });
+  });
+
+  // Wire up submit
+  document.getElementById("dynamicFeedbackForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleFeedbackSubmit(form);
+  });
+
+  openModal("feedbackModalOverlay");
+}
+
+function handleFeedbackSubmit(form) {
+  // Validate: every star question rated, every yes/no answered
+  const answers = {};
+  let valid = true;
+
+  form.questions.forEach((q) => {
+    if (q.type === "star") {
+      const el = document.querySelector(`.star-rating[data-question="${q.id}"]`);
+      const val = el.dataset.selected;
+      if (!val) valid = false;
+      answers[q.id] = { text: q.text, answer: val ? `${val} / 5 ★` : null };
+    } else if (q.type === "yesno") {
+      const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+      if (!checked) valid = false;
+      answers[q.id] = { text: q.text, answer: checked ? checked.value : null };
+    }
+  });
+
+  if (!valid) {
+    alert("Please answer every question before submitting.");
+    return;
+  }
+
+  const suggestions = document.getElementById("feedbackSuggestions").value.trim();
+  const now = new Date();
+  const submission = {
+    id: `sub_${Date.now()}`,
+    formId: form.id,
+    title: form.title,
+    parentName: state.parent.name,
+    studentName: state.student.name,
+    date: now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+    time: now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+    status: "Submitted",
+    answers,
+    suggestions,
+  };
+
+  // Update state — pushing the record here is what drives both the
+  // "Feedback Submitted" dashboard count and the Submission History page,
+  // since both are always computed from state.submissions.
+  state.submittedFormIds.push(form.id);
+  state.submissions.push(submission);
+  saveState();
+
+  closeModal("feedbackModalOverlay");
+  showSuccessModal(submission);
+}
+
+function showSuccessModal(submission) {
+  document.getElementById("successDetails").innerHTML = `
+    <div class="sd-row"><span class="sd-key">Parent Name</span><span class="sd-val">${submission.parentName}</span></div>
+    <div class="sd-row"><span class="sd-key">Student Name</span><span class="sd-val">${submission.studentName}</span></div>
+    <div class="sd-row"><span class="sd-key">Feedback Title</span><span class="sd-val">${submission.title}</span></div>
+    <div class="sd-row"><span class="sd-key">Submitted</span><span class="sd-val">${submission.date}, ${submission.time}</span></div>
+    <div class="sd-row"><span class="sd-key">Status</span><span class="sd-val">${submission.status}</span></div>
+  `;
+  openModal("successModalOverlay");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("successOkBtn").addEventListener("click", () => {
+    closeModal("successModalOverlay");
+    // Refresh whichever pages are affected
+    renderDashboard();
+    renderForms();
+    renderHistory();
+    // If currently on the forms/dashboard page, the re-render above already updates it
+  });
+});
+
+/* ============================================================
+   10. VIEW SUBMISSION (read-only)
+   ============================================================ */
+
+function openViewModal(subId) {
+  const sub = state.submissions.find((s) => s.id === subId);
+  if (!sub) return;
+
+  document.getElementById("viewModalTitle").textContent = sub.title;
+
+  let html = `
+    <div class="autofill-grid">
+      ${infoRow("Parent Name", sub.parentName)}
+      ${infoRow("Student Name", sub.studentName)}
+      ${infoRow("Submitted", `${sub.date}, ${sub.time}`)}
+      ${infoRow("Status", sub.status)}
+    </div>
+  `;
+
+  Object.values(sub.answers).forEach((a) => {
+    html += `
+      <div class="question-block">
+        <p class="question-text">${a.text}</p>
+        <p style="margin:0;font-weight:700;color:var(--accent-teal);">${a.answer ?? "—"}</p>
+      </div>
+    `;
+  });
+
+  if (sub.suggestions) {
+    html += `
+      <div class="question-block">
+        <p class="question-text">Suggestions for improvement</p>
+        <p style="margin:0;">${sub.suggestions}</p>
+      </div>
+    `;
+  }
+
+  document.getElementById("viewModalBody").innerHTML = html;
+  openModal("viewModalOverlay");
+}
+
+/* ============================================================
+   11. MODAL HELPERS
+   ============================================================ */
+
+function openModal(id) {
+  document.getElementById(id).classList.add("open");
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove("open");
+}
+
+/* ============================================================
+   12. INIT + EVENT WIRING
+   ============================================================ */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  renderDashboard();
+  renderProfile();
+  renderForms();
+  renderHistory();
+  renderAnnouncements();
+
+  /* ---------- Accent Color (Settings page) ---------- */
+  applyAccentColor(getSavedAccentColor());
+  document.getElementById("accentColorRow").addEventListener("click", (e) => {
+    const swatch = e.target.closest(".accent-swatch");
+    if (!swatch) return;
+    const name = swatch.dataset.accent;
+    applyAccentColor(name);
+    saveAccentColor(name);
+  });
+
+  /* ---------- Universal page navigation ---------- */
+  document.body.addEventListener("click", (e) => {
+    const navEl = e.target.closest("[data-page]");
+    if (navEl) {
+      e.preventDefault();
+      switchPage(navEl.dataset.page);
+      document.getElementById("profileDropdown").classList.remove("open");
+    }
+  });
+
+  /* ---------- Keyboard activation for clickable stat cards ---------- */
+  document.body.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const card = e.target.closest(".stat-card.clickable[data-page]");
+    if (card) {
+      e.preventDefault();
+      switchPage(card.dataset.page);
+    }
+  });
+
+  /* ---------- Start Now / Give Feedback buttons (delegated) ---------- */
+  document.body.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-form-id]");
+    if (btn) openFeedbackModal(btn.dataset.formId);
+  });
+
+  /* ---------- Submission history "View" buttons (delegated) ---------- */
+  document.body.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-view-id]");
+    if (btn) openViewModal(btn.dataset.viewId);
+  });
+
+  /* ---------- Announcement view/download (delegated) ---------- */
+  document.body.addEventListener("click", (e) => {
+    const viewBtn = e.target.closest("[data-announce-view]");
+    if (viewBtn) {
+      const a = ANNOUNCEMENTS.find((x) => x.id === viewBtn.dataset.announceView);
+      showInfoModal(a.title, a.desc);
+    }
+    const pdfBtn = e.target.closest("[data-announce-pdf]");
+    if (pdfBtn) {
+      alert("Downloading PDF…");
+    }
+  });
+
+  /* ---------- Generic modal close (X buttons + Cancel buttons, including
+     ones added dynamically inside the feedback form — delegated) ---------- */
+  document.body.addEventListener("click", (e) => {
+    const closeBtn = e.target.closest("[data-close-modal]");
+    if (closeBtn) closeModal(closeBtn.dataset.closeModal);
+  });
+  document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.classList.remove("open");
+    });
+  });
+
+  /* ---------- Sidebar toggle ---------- */
+  document.getElementById("menuToggle").addEventListener("click", () => {
+    if (window.innerWidth <= 860) {
+      document.body.classList.toggle("sidebar-open");
+    } else {
+      document.body.classList.toggle("sidebar-collapsed");
+    }
+  });
+
+  /* ---------- Theme toggle (topbar + settings kept in sync) ---------- */
+  const themeToggle = document.getElementById("themeToggle");
+  const settingsDarkModeToggle = document.getElementById("settingsDarkModeToggle");
+
+  function applyTheme(isLight) {
+    document.body.classList.toggle("light-mode", isLight);
+    themeToggle.textContent = isLight ? "🌙" : "☀";
+    settingsDarkModeToggle.checked = !isLight;
+  }
+
+  themeToggle.addEventListener("click", () => {
+    applyTheme(!document.body.classList.contains("light-mode"));
+  });
+
+  settingsDarkModeToggle.addEventListener("change", () => {
+    applyTheme(!settingsDarkModeToggle.checked);
+  });
+
+  /* ---------- Notification button ---------- */
+  document.getElementById("notifBtn").addEventListener("click", () => {
+    alert(`You have ${state.stats.announcements} announcements and ${getPendingCount()} pending feedback form(s).`);
+  });
+
+  /* ---------- Profile dropdown ---------- */
+  const profileTrigger = document.getElementById("profileTrigger");
+  const profileDropdown = document.getElementById("profileDropdown");
+  profileTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle("open");
+  });
+  document.addEventListener("click", () => profileDropdown.classList.remove("open"));
+
+  /* ---------- Edit Profile ---------- */
+  function openEditProfile() {
+    document.getElementById("editParentName").value = state.parent.name;
+    document.getElementById("editParentEmail").value = state.parent.email;
+    document.getElementById("editParentMobile").value = state.parent.mobile;
+    document.getElementById("editParentAddress").value = state.parent.address;
+    openModal("editProfileModalOverlay");
+  }
+  document.getElementById("editProfileBtn").addEventListener("click", openEditProfile);
+  document.getElementById("settingsEditProfile").addEventListener("click", openEditProfile);
+  document.getElementById("settingsUpdateEmail").addEventListener("click", openEditProfile);
+  document.getElementById("settingsUpdateMobile").addEventListener("click", openEditProfile);
+
+  document.getElementById("editProfileForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    state.parent.name = document.getElementById("editParentName").value.trim() || state.parent.name;
+    state.parent.email = document.getElementById("editParentEmail").value.trim() || state.parent.email;
+    state.parent.mobile = document.getElementById("editParentMobile").value.trim() || state.parent.mobile;
+    state.parent.address = document.getElementById("editParentAddress").value.trim() || state.parent.address;
+    saveState();
+    renderProfile();
+    closeModal("editProfileModalOverlay");
+    alert("Profile updated successfully.");
+  });
+
+  /* ---------- Account Security (Settings page, inline) ---------- */
+  document.getElementById("accountSecurityForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    e.target.reset();
+    alert("Your password has been updated.");
+  });
+
+  /* ---------- Settings: notification toggles ---------- */
+  document.querySelectorAll("[data-toggle]").forEach((toggle) => {
+    toggle.addEventListener("change", () => {
+      // Simulated preference save
+      console.log(`${toggle.dataset.toggle} notifications: ${toggle.checked ? "on" : "off"}`);
+    });
+  });
+
+  /* ---------- Settings: info rows (Privacy, Terms, FAQs, etc.) ---------- */
+  document.querySelectorAll("[data-info]").forEach((row) => {
+    row.addEventListener("click", () => {
+      const key = row.dataset.info;
+      showInfoModal(key, INFO_TEXT[key] || "More information coming soon.");
+    });
+  });
+
+  function showInfoModal(title, body) {
+    document.getElementById("infoModalTitle").textContent = title;
+    document.getElementById("infoModalBody").textContent = body;
+    openModal("infoModalOverlay");
+  }
+
+  /* ---------- Logout flow ---------- */
+  function requestLogout(e) {
+    e.preventDefault();
+    openModal("logoutModalOverlay");
+  }
+  document.getElementById("logoutBtn").addEventListener("click", requestLogout);
+  document.getElementById("dropdownLogout").addEventListener("click", requestLogout);
+
+  document.getElementById("confirmLogoutBtn").addEventListener("click", () => {
+    closeModal("logoutModalOverlay");
+    document.getElementById("loginScreen").classList.add("open");
+  });
+
+  document.getElementById("reLoginBtn").addEventListener("click", () => {
+    document.getElementById("loginScreen").classList.remove("open");
+    switchPage("dashboard");
+  });
+
+});
+
+</script>
+</body>
+</html>
